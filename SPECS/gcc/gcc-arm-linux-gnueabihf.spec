@@ -38,8 +38,8 @@ BuildRequires: binutils-arm-linux-gnueabihf
 Requires: binutils-arm-linux-gnueabihf
 
 %global target_arch arm-unknown-linux-gnueabihf
-%global target_linux_arch arm32
-%global sysroot /target-armhf
+%global target_linux_arch arm
+%global sysroot /target-arm
 
 %description
 The GCC package contains the GNU compiler collection,

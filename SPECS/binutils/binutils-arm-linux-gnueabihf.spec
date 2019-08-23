@@ -12,7 +12,7 @@ Source0: https://ftp.gnu.org/gnu/binutils/binutils-%{version}.tar.xz
 BuildArch: x86_64
 
 %define target_arch arm-unknown-linux-gnueabihf
-%define sysroot /target-armhf
+%define sysroot /target-arm
 
 %description
 The Binutils package contains a linker, an assembler,
