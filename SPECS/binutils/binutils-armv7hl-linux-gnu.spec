@@ -1,4 +1,4 @@
-Name:    binutils-arm-linux-gnueabihf
+Name:    binutils-armv7hl-linux-gnu
 Summary: Cross Binutils for ARM EABI hard-float
 Version: 2.31.1
 Release: 1%{?dist}
@@ -11,12 +11,8 @@ Source0: https://ftp.gnu.org/gnu/binutils/binutils-%{version}.tar.xz
 %define sha1 binutils=3b031410897fe224412f3a6a1b052402d2fbcc6a
 BuildArch: x86_64
 
-%define target_arch arm-unknown-linux-gnueabihf
-%define sysroot /target-arm
-
-%define target_arm_arch armv7a
-%define target_fpu vfp
-%define target_float hard
+%define target_arch armv7hl-unknown-linux-gnueabi
+%define sysroot /target-armv7hl
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -27,11 +23,18 @@ and other tools for handling object files.
 
 %build
 
+CONFIG_FLAGS="\
+    --with-arch=armv7a \
+    --with-fpu=vfp \
+    --with-float=hard \
+"
+
 sh configure \
     --prefix=%{_prefix} \
     --target=%{target_arch} \
     --with-sysroot=%{sysroot} \
-    --disable-multilib && \
+    --disable-multilib \
+    $CONFIG_FLAGS && \
 make configure-host && \
 make %{?_smp_mflags}
 

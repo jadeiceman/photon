@@ -6,7 +6,7 @@
 %define linux_kernel_version 4.19.52
 %define glibc_version 2.28
 
-Name:    gcc-arm-linux-gnueabihf
+Name:    gcc-armv7hl-linux-gnueabi
 Summary: Cross GCC for ARM HF
 Version: 7.3.0
 Release: 1%{?dist}
@@ -35,16 +35,13 @@ Provides: libgcc_s.so.1(GCC_3.0)
 Provides: libgcc_s.so.1(GCC_3.3)
 Provides: libgcc_s.so.1(GCC_4.2.0)
 Provides: libgcc_s.so.1(GLIBC_2.0)
-BuildRequires: binutils-arm-linux-gnueabihf
-Requires: binutils-arm-linux-gnueabihf
+BuildRequires: binutils-armv7hl-linux-gnueabi
+Requires: binutils-armv7hl-linux-gnueabi
 
-%global target_arch arm-unknown-linux-gnueabihf
+%global target_arch armv7hl-unknown-linux-gnueabi
 %global target_linux_arch arm
-%global sysroot /target-arm
+%global sysroot /target-armv7hl
 
-%global target_arm_arch armv7a
-%global target_fpu vfp
-%global target_float hard
 %global target_gcc_arm_arch armv7-a
 
 %description
@@ -70,6 +67,18 @@ ln -sf `ls -1d ../mpc-*/` mpc
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 %build
+
+GCC_CONFIG_OPTS="\
+    --with-arch=armv7-a \
+    --with-fpu=vfp \
+    --with-float=hard \
+"
+
+GLIBC_CONFIG_OPTS="\
+    --with-arch=armv7a \
+    --with-fpu=vfp \
+    --with-float=hard \
+"
 
 # Create usrmove symlinks
 mkdir -p %{sysroot}/usr/lib && ln -s usr/lib %{sysroot}/lib
@@ -102,15 +111,13 @@ cd $builddir/build-gcc-%{target_arch} && \
 $builddir/gcc-%{version}/configure \
     --prefix=%{_prefix} \
     --target=%{target_arch} \
-	--with-arch=%{target_gcc_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
     --with-sysroot=%{sysroot} \
     --enable-plugins \
     --enable-languages=c \
     --enable-threads=posix \
     --enable-linker-build-id \
-    --disable-multilib && \
+    --disable-multilib \
+    $GCC_CONFIG_OPTS && \
 make %{?_smp_mflags} all-gcc && \
 make install-gcc
 
@@ -128,11 +135,9 @@ $builddir/glibc-%{glibc_version}/configure \
     --build=$MACHTYPE \
     --host=%{target_arch} \
     --target=%{target_arch} \
-	--with-arch=%{target_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
     --with-headers=%{sysroot}/usr/include \
     --disable-multilib \
+    $GLIBC_CONFIG_OPTS \
     libc_cv_forced_unwind=yes && \
 make install-bootstrap-headers=yes install-headers install_root=%{sysroot} && \
 make %{?_smp_mflags} csu/subdir_lib && \
@@ -158,9 +163,6 @@ cd $builddir/build-gcc-%{target_arch} && \
 $builddir/gcc-%{version}/configure \
     --prefix=%{_prefix} \
     --target=%{target_arch} \
-	--with-arch=%{target_gcc_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
     --with-sysroot=%{sysroot} \
     --enable-shared \
     --enable-threads=posix \
@@ -170,7 +172,8 @@ $builddir/gcc-%{version}/configure \
     --disable-multilib \
     --enable-linker-build-id \
     --enable-plugin \
-    --with-system-zlib && \
+    --with-system-zlib \
+    $GCC_CONFIG_OPTS && \
 make %{?_smp_mflags} all-target-libgcc && \
 make install-target-libgcc
 make %{?_smp_mflags} DESTDIR=%{buildroot} install-target-libgcc

@@ -34,6 +34,7 @@ class PackageManager(object):
             self.dockerClient = docker.from_env(version="auto")
 
     def buildToolChain(self):
+        self.logger.debug(">>>> PackageManager buildToolChain")
         pkgCount = 0
         try:
             tUtils = ToolChainUtils()
@@ -66,6 +67,7 @@ class PackageManager(object):
             self._createBuildContainer(False)
 
     def buildPackages(self, listPackages, buildThreads):
+        self.logger.debug(">>>> PackageManager buildPackages start...")
         if constants.rpmCheck:
             constants.rpmCheck = False
             constants.addMacro("with_check", "0")
@@ -109,6 +111,7 @@ class PackageManager(object):
                 listRPMPackages = SPECS.getData().getRPMPackages(package, version)
                 for rpmPkg in listRPMPackages:
                     if pkgUtils.findRPMFile(rpmPkg, version) is None:
+                    #if pkgUtils.findRPMFile(rpmPkg, version, constants.buildArch) is None:
                         packageIsAlreadyBuilt=False
                         break;
                 if packageIsAlreadyBuilt:
@@ -181,6 +184,7 @@ class PackageManager(object):
 
         for i in range(0, buildThreads):
             workerName = "WorkerThread" + str(i)
+            self.logger.debug(">>>> Starting worker thread: %s", workerName)
             ThreadPool.addWorkerThread(workerName)
             ThreadPool.startWorkerThread(workerName)
 

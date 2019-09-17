@@ -117,7 +117,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libopcodes.a
 %{_libdir}/libbfd.so
 %{_libdir}/libopcodes.so
-%{_lib64dir}/libiberty.a
+%{_libdir}/libiberty.a
 
 %changelog
 *   Thu Mar 14 2019 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.31.1-4

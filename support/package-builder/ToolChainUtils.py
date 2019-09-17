@@ -52,11 +52,14 @@ class ToolChainUtils(object):
             pkgUtils = PackageUtils(self.logName, self.logPath)
             coreToolChainYetToBuild = []
             doneList = []
+            #self.logger.debug(">>>> Looking for available packages...")
             for package in constants.listCoreToolChainPackages:
                 version = SPECS.getData().getHighestVersion(package)
                 rpmPkg = pkgUtils.findRPMFile(package, version)
+                #rpmPkg = pkgUtils.findRPMFile(package, version, constants.buildArch)
                 if rpmPkg is not None:
                     doneList.append(package+'-'+version)
+                    #self.logger.debug(">>>>>> %s", package+'-'+version)
                     continue
                 else:
                     coreToolChainYetToBuild.append(package)
@@ -74,6 +77,8 @@ class ToolChainUtils(object):
                     CommandUtils.runCommandInShell("mkdir -p " + destLogPath)
                 chroot = Chroot(self.logger)
                 chroot.create(package + "-" + version)
+                #self.logger.debug(">>>>> Done List:")
+                #self.logger.info(doneList)
                 self.installToolchainRPMS(chroot, package, version, availablePackages=doneList)
                 pkgUtils.adjustGCCSpecs(chroot, package, version)
                 pkgUtils.buildRPMSForGivenPackage(chroot, package, version, destLogPath)
@@ -100,14 +105,26 @@ class ToolChainUtils(object):
         packages = ""
         listBuildRequiresPackages = []
 
+        #self.logger.debug(">>>> Available Packages:")
+        #self.logger.info(availablePackages)
+
         listRPMsToInstall=list(constants.listToolChainRPMsToInstall)
         if constants.crossCompiling:
+            self.logger.debug(">>>> CrossCompiling = true")
             targetPackageName = packageName
             packageName = None
             packageVersion = None
-            listRPMsToInstall.extend(['binutils-'+constants.targetArch+'-linux-gnu',
-                                      'gcc-'+constants.targetArch+'-linux-gnu'])
+            
+            listRPMsToInstall.extend(['binutils-'+constants.targetArch+'-'+constants.targetArchSuffix,
+                                      'gcc-'+constants.targetArch+'-'+constants.targetArchSuffix])
+                                      
+            #listRPMsToInstall.extend(['binutils-'+constants.targetArch+'-linux-gnu',
+            #                          'gcc-'+constants.targetArch+'-linux-gnu'])
+            #self.logger.debug(">>>> Target package name: %s", targetPackageName)
+            #self.logger.debug(">>>> List RPMs to install:")
+            #self.logger.info(listRPMsToInstall)
         if packageName:
+            #self.logger.debug(">>>> Getting dependent packages for %s", packageName)
             listBuildRequiresPackages = self.getListDependentPackages(packageName, packageVersion)
         for package in listRPMsToInstall:
             pkgUtils = PackageUtils(self.logName, self.logPath)
@@ -125,15 +142,26 @@ class ToolChainUtils(object):
                 version = SPECS.getData(constants.buildArch).getHighestVersion(package)
 
             if availablePackages is not None:
+                #self.logger.debug(">>>> availablePackages is not None")
                 basePkg = SPECS.getData(constants.buildArch).getSpecName(package)+"-"+version
                 isAvailable = basePkg in availablePackages
+                #self.logger.debug(">>>> basePkg: %s", basePkg)
+                #self.logger.debug(">>>> availablePackages:")
+                #self.logger.info(availablePackages)
+                #self.logger.debug(">>>> isAvailable: %r", isAvailable)
             else:
                 # if availablePackages is not provided (rear case) it is safe
                 # to use findRPMFile()
                 isAvailable = True
 
             if constants.rpmCheck:
+                #self.logger.debug(">>>> constants.rpmCheck = true")
                 rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
+            
+            #self.logger.debug(">>>> Finding RPM file: %s", package)
+            rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
+            
+            #self.logger.debug(">>>> rpmFile is None = %r", rpmFile is None)
 
             if rpmFile is None:
                 # Honor the toolchain list order.
@@ -150,6 +178,7 @@ class ToolChainUtils(object):
                     rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
 
             if rpmFile is None:
+                self.logger.debug(">>>> usePublishedRPMS=%r, isAvailable=%r, crossCompiling=%r", usePublishedRPMS, isAvailable, constants.crossCompiling)
                 if not usePublishedRPMS or isAvailable or constants.crossCompiling:
                     raise Exception("%s-%s.%s not found in available packages" % (package, version, constants.buildArch))
 
@@ -244,7 +273,7 @@ class ToolChainUtils(object):
         CommandUtils.runCommandInShell(cmd, logfn=self.logger.debug)
 
         if rpmFiles != "":
-            cmd = (self.rpmCommand+" -Uvh --nodeps --ignorearch --noscripts --root "+
+            cmd = (self.rpmCommand+" -Uvh --nodeps --ignorearch --ignoreos --noscripts --root "+
                    chroot.getID() +"/target-"+ constants.targetArch+
                    " --define \'_dbpath /var/lib/rpm\' "+rpmFiles)
             retVal = CommandUtils.runCommandInShell(cmd, logfn=self.logger.debug)

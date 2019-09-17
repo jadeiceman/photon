@@ -17,13 +17,12 @@ Summary:	Header and development files for mpfr
 Requires:	%{name} = %{version}
 
 %description	devel
-It contains the libraries and header files to create applications 
+It contains the libraries and header files to create applications
 
 %prep
 %setup -q
 %build
-./configure \
-	--prefix=%{_prefix} \
+%configure \
 	--enable-thread-safe \
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules

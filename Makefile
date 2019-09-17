@@ -85,6 +85,12 @@ else
 CROSS_TARGET_FLAGS =
 endif
 
+ifdef CROSS_TARGET_SUFFIX
+CROSS_TARGET_SUFFIX_FLAGS = --cross-target-suffix $(CROSS_TARGET_SUFFIX)
+else
+CROSS_TARGET_SUFFIX_FLAGS =
+endif
+
 TOOLS_BIN := $(SRCROOT)/tools/bin
 CONTAIN := $(TOOLS_BIN)/contain
 ifeq ($(ARCH),x86_64)
@@ -160,6 +166,7 @@ packages: check-docker-py check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_XRPMS) $(
 		$(PHOTON_RPMCHECK_FLAGS) \
 		$(PHOTON_KAT_BUILD_FLAGS) \
 		$(CROSS_TARGET_FLAGS) \
+		$(CROSS_TARGET_SUFFIX_FLAGS) \
 		$(PUBLISH_BUILD_DEPENDENCIES) \
 		$(PACKAGE_WEIGHTS) \
 		--threads ${THREADS}
@@ -187,6 +194,7 @@ packages-docker: check-docker-py check-docker-service check-tools $(PHOTON_STAGE
 		$(PACKAGE_BUILD_OPTIONS) \
 		$(PHOTON_RPMCHECK_FLAGS) \
 		$(CROSS_TARGET_FLAGS) \
+		$(CROSS_TARGET_SUFFIX_FLAGS) \
 		$(PUBLISH_BUILD_DEPENDENCIES) \
 		$(PACKAGE_WEIGHTS) \
 		--threads ${THREADS}
@@ -278,6 +286,7 @@ tool-chain-stage2: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_S
 		$(PHOTON_RPMCHECK_FLAGS) \
 		$(PHOTON_KAT_BUILD_FLAGS) \
 		$(CROSS_TARGET_FLAGS) \
+		$(CROSS_TARGET_SUFFIX_FLAGS) \
 		--log-path $(PHOTON_LOGS_DIR) \
 		--threads ${THREADS}
 

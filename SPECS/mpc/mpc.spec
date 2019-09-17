@@ -20,8 +20,7 @@ the result.
 %setup -q
 
 %build
-./configure \
-	--prefix=%{_prefix} \
+%configure \
 	--disable-silent-rules
 make %{?_smp_mflags}
 

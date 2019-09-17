@@ -248,7 +248,12 @@ class PackageUtils(object):
 
 
     def _buildRPM(self, sandbox, specFile, logFile, package, version, macros):
+        self.logger.debug("RPM Macros: %s", macros)
         rpmBuildcmd = self.rpmbuildBinary + " " + self.rpmbuildBuildallOption
+        
+        if constants.logLevel == "debug":
+            rpmBuildcmd += ' -vv'
+            self.logger.debug("Log file path: %s", logFile)
 
         if constants.rpmCheck and package in constants.testForceRPMS:
             self.logger.debug("#" * (68 + 2 * len(package)))
@@ -272,13 +277,20 @@ class PackageUtils(object):
 
         if constants.crossCompiling:
             rpmBuildcmd += ' --define \"_build %s-unknown-linux-gnu\"' % constants.buildArch
-            rpmBuildcmd += ' --define \"_host %s-unknown-linux-gnu\"' % constants.targetArch
-            rpmBuildcmd += ' --target='+constants.targetArch+'-unknown-linux-gnu'
-
+            rpmBuildcmd += ' --define \"_host %s-unknown-%s\"' % (constants.targetArch, constants.targetArchSuffix)
+            rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
+            #rpmBuildcmd += ' --define \"_prefix /usr\"'
+            rpmBuildcmd += ' --define \"_datarootdir /usr/share\"'
+            rpmBuildcmd += ' --target='+constants.targetArch+'-unknown-'+constants.targetArchSuffix
+            
         rpmBuildcmd += " " + specFile
 
         self.logger.debug("Building rpm....")
         self.logger.debug(rpmBuildcmd)
+        
+        sandbox.run("uname -a", logfile = logFile, logfn = self.logger.debug)
+        #sandbox.run("rpm --eval '%{_arch}' ", logfile = logFile, logfn = self.logger.debug)
+        #sandbox.run("rpm --eval '%{_datarootdir}' ", logfile = logFile, logfn = self.logger.debug)
 
         returnVal = sandbox.run(rpmBuildcmd, logfile = logFile)
 

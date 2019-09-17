@@ -15,6 +15,7 @@ class SpecData(object):
     def __init__(self, arch, logPath, specFilesPath):
         self.arch = arch
         self.logger = Logger.getLogger("SpecData", logPath, constants.logLevel)
+        self.logger.debug(">>>> SpecData arch: %s, logPath: %s, specFilesPath: %s", arch, logPath, specFilesPath)
 
         # map default package name to list of SpecObjects. Usually it is just
         # a list with only one element. But, for multiversion spec file this

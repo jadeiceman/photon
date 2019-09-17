@@ -56,7 +56,8 @@ def main():
                         default="../../common/data/packageWeights.json")
     parser.add_argument("-bt", "--build-type", dest="pkgBuildType", choices=['chroot', 'container'], default="chroot")
     parser.add_argument("-F", "--kat-build", dest="katBuild", default=None)
-    parser.add_argument("-ct", "--cross-target", dest="targetArch", choices=['x86_64', 'aarch64', 'arm'], default=None)
+    parser.add_argument("-ct", "--cross-target", dest="targetArch", choices=['x86_64', 'aarch64', 'arm', 'armv7hl'], default=None)
+    parser.add_argument("-cts", "--cross-target-suffix", dest="targetArchSuffix", default="linux-gnu")
     parser.add_argument("-pj", "--packages-json-input", dest="pkgJsonInput", default=None)
     parser.add_argument("PackageName", nargs='?')
     options = parser.parse_args()
@@ -123,6 +124,9 @@ def main():
 
     if options.targetArch:
         constants.targetArch = options.targetArch
+        
+    if options.targetArchSuffix:
+        constants.targetArchSuffix = options.targetArchSuffix
 
     cmdUtils.runCommandInShell("mkdir -p "+options.rpmPath+"/"+constants.buildArch)
     cmdUtils.runCommandInShell("mkdir -p "+options.rpmPath+"/noarch")
@@ -177,28 +181,36 @@ def main():
         # parse SPECS folder
         SPECS()
         if options.toolChainStage == "stage1":
+            logger.info(">>>> Stage 1")
             pkgManager = PackageManager()
             pkgManager.buildToolChain()
         elif options.toolChainStage == "stage2":
+            logger.info(">>>> Stage 2")
             pkgManager = PackageManager()
             pkgManager.buildToolChainPackages(options.buildThreads)
         else:
             if constants.buildArch != constants.targetArch:
+                logger.info(">>>> CROSS COMPILATION: buildArch != targetArch")
                 # It is cross compilation.
                 # first build all native packages
+                logger.info(">>>> Build all native packages...")
                 buildPackagesForAllSpecs(options.buildThreads,
                                          options.pkgBuildType,
                                          pkgInfoJsonFile, logger)
                 # Then do the build to the target
+                logger.info(">>>> Build target (%s)...", constants.targetArch)
                 constants.currentArch = constants.targetArch
                 constants.crossCompiling = True
 
             if options.installPackage:
+                logger.info(">>>> Build specified packages...")
                 buildSpecifiedPackages([package], options.buildThreads, options.pkgBuildType)
             elif options.pkgJsonInput:
+                logger.info(">>>> Build packages in JSON...")
                 buildPackagesInJson(options.pkgJsonInput, options.buildThreads,
                                     options.pkgBuildType, pkgInfoJsonFile, logger)
             else:
+                logger.info(">>>> Build packages for all specs...")
                 buildPackagesForAllSpecs(options.buildThreads, options.pkgBuildType,
                                          pkgInfoJsonFile, logger)
     except Exception as e:

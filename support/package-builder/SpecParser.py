@@ -14,7 +14,7 @@ class SpecParser(object):
             self.position = -1
             self.endposition = -1
 
-    def __init__(self, specfile, arch):
+    def __init__(self, specfile, arch):    
         self.arch = arch
         self.cleanMacro = None
         self.prepMacro = None
