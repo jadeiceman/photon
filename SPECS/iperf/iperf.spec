@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 %build
 echo "VDBG optflags: " %{optflags}
 ./bootstrap.sh
-./configure \
+%configure \
         CFLAGS="%{optflags}" \
         CXXFLAGS="%{optflags}" \
         --disable-silent-rules \

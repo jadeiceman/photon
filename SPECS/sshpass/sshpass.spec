@@ -17,7 +17,7 @@ sshpass is a utility designed for running ssh using the mode referred to as "key
 %setup -q
 
 %build
-./configure --prefix=%{_prefix} 
+%configure --prefix=%{_prefix} 
 make %{?_smp_mflags}
 
 %install

@@ -40,7 +40,7 @@ development libs and header files for c-rest-engine
 %build
 cd build
 autoreconf -mif ..
-../configure \
+.%configure \
     --host=%{_host} --build=%{_build} \
     --prefix=%{_prefix} \
     --with-ssl=/usr \

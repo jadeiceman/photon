@@ -17,7 +17,7 @@ Socat is a command line based utility that establishes two bidirectional byte st
 %setup -q
 
 %build
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
+%configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
 
 make %{?_smp_mflags}
 

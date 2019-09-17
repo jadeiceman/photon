@@ -21,7 +21,7 @@ also production-grade software, suitable for use in high-volume and high-reliabi
 %prep
 %setup -qn bind-%{version}
 %build
-./configure \
+%configure \
     --prefix=%{_prefix}
 make -C lib/dns %{?_smp_mflags}
 make -C lib/isc %{?_smp_mflags}

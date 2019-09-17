@@ -29,7 +29,7 @@ It contains the libraries and header files to create applications
 %build
 ./autogen.sh
 
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--enable-libwebpmux \
 	--enable-libwebpdemux \

@@ -30,7 +30,7 @@ setting LAN configuration, and chassis power control.
 %setup -q
 
 %build
-./configure --with-kerneldir \
+%configure --with-kerneldir \
     --with-rpm-distro= \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \

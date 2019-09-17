@@ -19,7 +19,7 @@ This provides Common development macros for GNOME.
 ./autogen.sh
 
 %build
-./configure \
+%configure \
         --prefix=%{_prefix}
 make %{?_smp_mflags}
 

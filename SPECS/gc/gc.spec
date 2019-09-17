@@ -30,7 +30,7 @@ developing applications that use gc.
 ln -sfv libatomic_ops-7.6.6 libatomic_ops
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--datadir=%{_docdir} \
         --enable-cplusplus

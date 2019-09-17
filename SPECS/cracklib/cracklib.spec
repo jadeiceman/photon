@@ -112,7 +112,7 @@ install %{SOURCE1} dicts/
 
 %build
 
-CFLAGS="$RPM_OPT_FLAGS" ./configure \
+CFLAGS="$RPM_OPT_FLAGS" %configure \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
   --libdir=%{_libdir} \

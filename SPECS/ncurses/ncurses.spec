@@ -51,8 +51,8 @@ It contains all terminfo files
 %build
 mkdir v6
 pushd v6
-ln -s ../configure .
-./configure \
+ln -s .%configure .
+%configure \
     --prefix=%{_prefix} \
     --mandir=%{_mandir} \
     --with-shared \
@@ -67,8 +67,8 @@ make %{?_smp_mflags}
 popd
 mkdir v5
 pushd v5
-ln -s ../configure .
-./configure \
+ln -s .%configure .
+%configure \
     --prefix=%{_prefix} \
     --mandir=%{_mandir} \
     --with-shared \
@@ -106,7 +106,7 @@ cp -v -R doc/* %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 
 %check
 cd test
-./configure
+%configure
 make
 
 %post libs -p /sbin/ldconfig

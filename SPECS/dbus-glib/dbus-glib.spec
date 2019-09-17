@@ -29,7 +29,7 @@ Headers and static libraries for the D-Bus GLib bindings
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
         --disable-static \

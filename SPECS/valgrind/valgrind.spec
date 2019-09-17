@@ -25,7 +25,7 @@ programs.
 %patch0 -p1
 
 %build
-./configure --prefix=%{_prefix}
+%configure --prefix=%{_prefix}
 make
 
 %install

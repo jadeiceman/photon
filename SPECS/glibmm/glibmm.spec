@@ -37,7 +37,7 @@ These are the header files of glibmm.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--bindir=%{_bindir} 
 make %{?_smp_mflags}

@@ -38,7 +38,7 @@ developing applications that use guile.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--disable-static
 make %{?_smp_mflags}

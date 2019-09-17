@@ -23,7 +23,7 @@ interrupts across all of a systems cpus.
 %build
 sed -i 's/libsystemd-journal/libsystemd/' configure.ac
 ./autogen.sh
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --disable-static \
     --with-systemd

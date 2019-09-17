@@ -67,7 +67,7 @@ and libauparse.
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --exec_prefix=/usr \
     --sbindir=%{_sbindir} \

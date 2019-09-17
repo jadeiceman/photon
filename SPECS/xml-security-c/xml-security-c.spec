@@ -26,7 +26,7 @@ This package contains development headers and static library for xml security.
 %setup -q
 %patch0 -p1
 %build
-./configure --prefix=/usr
+%configure --prefix=/usr
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

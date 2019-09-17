@@ -53,7 +53,7 @@ Python bindings.
 %prep
 %setup -q
 %build
-./configure --prefix=/usr \
+%configure --prefix=/usr \
             --sysconfdir=/etc \
             --enable-sce \
             --enable-perl

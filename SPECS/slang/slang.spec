@@ -29,7 +29,7 @@ It contains the libraries and header files to create applications
 %setup -q -n %{name}-%{version}
 
 %build
-./configure --prefix=%{_prefix} \
+%configure --prefix=%{_prefix} \
             --sysconfdir=%{_sysconfdir} \
             --with-readline=gnu
 make -j1

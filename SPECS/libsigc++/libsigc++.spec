@@ -17,7 +17,7 @@ It allows to define signals and to connect those signals to any callback functio
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--bindir=%{_bindir}
 make %{?_smp_mflags}

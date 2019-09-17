@@ -23,7 +23,7 @@ The  purpose  of  xmlto is to convert an XML file to the desired format
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix}
 
 make %{?_smp_mflags}

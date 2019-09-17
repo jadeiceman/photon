@@ -23,7 +23,7 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %setup -q
 %build
 
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

@@ -33,7 +33,7 @@ Development files for libedit
 %setup -qn libedit-%{libedit_release}-%{libedit_version}
 
 %build
-./configure \
+%configure \
 --prefix=%{_prefix} \
 --disable-static
 

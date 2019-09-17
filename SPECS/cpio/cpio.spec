@@ -24,7 +24,7 @@ These are the additional language files of cpio
 %setup -q
 %build
 sed -i -e '/gets is a/d' gnu/stdio.in.h
-./configure \
+%configure \
 	--prefix=%{_prefix} \
         --bindir=%{_bindir} \
         --enable-mt   \

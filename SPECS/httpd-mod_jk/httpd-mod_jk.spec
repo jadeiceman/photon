@@ -24,7 +24,7 @@ mod_jk is a module connecting Tomcat and Apache
 
 %build
 cd native
-./configure --with-apxs=%{_bindir}/apxs
+%configure --with-apxs=%{_bindir}/apxs
 
 make %{?_smp_mflags}
 

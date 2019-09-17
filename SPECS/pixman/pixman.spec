@@ -25,7 +25,7 @@ It contains the libraries and header files to create applications
 %prep
 %setup -q 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	CFLAGS="-O3 -fPIC" \
 	--disable-static

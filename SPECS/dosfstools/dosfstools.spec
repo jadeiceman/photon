@@ -14,7 +14,7 @@ dosfstools contains utilities for making and checking MS-DOS FAT filesystems.
 %prep
 %setup -q
 %build
-./configure --prefix=%{_prefix} --enable-compat-symlinks
+%configure --prefix=%{_prefix} --enable-compat-symlinks
 make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*

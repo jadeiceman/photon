@@ -26,7 +26,7 @@ It contains the libraries and header files to create applications
 
 %build
 export CFLAGS="%{optflags}"
-./configure  --prefix=%{_prefix} --disable-static
+%configure  --prefix=%{_prefix} --disable-static
 
 make %{?_smp_mflags}
 

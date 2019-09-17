@@ -14,7 +14,7 @@ Contains GNU archiving program
 %prep
 %setup -q
 %build
-FORCE_UNSAFE_CONFIGURE=1  ./configure \
+FORCE_UNSAFE_CONFIGURE=1  %configure \
 	--prefix=%{_prefix} \
 	--bindir=/bin \
 	--disable-silent-rules

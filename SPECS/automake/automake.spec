@@ -18,7 +18,7 @@ Contains programs for generating Makefiles for use with Autoconf.
 %setup -q
 %build
 sed -i 's:/\\\${:/\\\$\\{:' bin/automake.in
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules
@@ -29,7 +29,7 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
 
 %check
-sed -i "s:./configure:LEXLIB=/usr/lib/libfl.a &:" t/lex-{clean,depend}-cxx.sh
+sed -i "s:%configure:LEXLIB=/usr/lib/libfl.a &:" t/lex-{clean,depend}-cxx.sh
 sed -i "s|test ! -s stderr||g" t/distcheck-no-prefix-or-srcdir-override.sh
 make %{?_smp_mflags} check
 

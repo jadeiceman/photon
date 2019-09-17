@@ -36,7 +36,7 @@ This package contains minimal set of shared xz libraries.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --docdir=%{_defaultdocdir}/%{name}-%{version} \
     --disable-static \

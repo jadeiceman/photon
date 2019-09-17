@@ -30,7 +30,7 @@ needed for development with %name.
 %{__rm} -rf $RPM_BUILD_ROOT
 
 %setup -q -n log4cpp
-CC=%{__cc} CXX=%{__cxx} ./configure --prefix=%{_prefix} 
+CC=%{__cc} CXX=%{__cxx} %configure --prefix=%{_prefix} 
 
 %build
 %{__make}

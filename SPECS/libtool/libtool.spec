@@ -30,7 +30,7 @@ This package contains static libraries and header files need for development.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --disable-silent-rules
 make %{?_smp_mflags}

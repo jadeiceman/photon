@@ -20,7 +20,7 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 %setup -q
 %patch0 -p1
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--sysconfdir=/etc
 make %{?_smp_mflags}

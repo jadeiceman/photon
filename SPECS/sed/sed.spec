@@ -25,7 +25,7 @@ These are the additional language files of sed.
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--bindir=/bin \
 	--htmldir=%{_defaultdocdir}/%{name}-%{version} \

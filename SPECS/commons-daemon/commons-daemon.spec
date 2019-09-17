@@ -35,12 +35,12 @@ export LDFLAGS=-m64
 %endif
 
 %ifarch aarch64
-sed -i 's/supported_os="aarch64"/supported_os="linux"/' src/native/unix/configure
+sed -i 's/supported_os="aarch64"/supported_os="linux"/' src/native/uni%configure
 %endif
 
 CURDIR=`pwd`
 
-cd src/native/unix && ./configure && make
+cd src/native/unix && %configure && make
 
 cd $CURDIR
 

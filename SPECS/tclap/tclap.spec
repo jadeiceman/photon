@@ -30,7 +30,7 @@ API documentation for TCLAP
 %setup -q
 
 %build
-./configure --prefix=%{_prefix}
+%configure --prefix=%{_prefix}
 make %{?_smp_mflags}
 
 %install

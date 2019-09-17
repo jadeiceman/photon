@@ -28,7 +28,7 @@ Development files for pam_tacplus.
 
 %build
 autoreconf -i
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

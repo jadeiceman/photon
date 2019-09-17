@@ -32,7 +32,7 @@ copenapi development files
 
 %build
 autoreconf -mif
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --disable-static
 make

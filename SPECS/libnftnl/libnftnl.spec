@@ -26,7 +26,7 @@ Development files for %{name}
 %setup -q
 
 %build
-./configure \
+%configure \
          --prefix=%{_prefix} \
          --disable-static \
          --disable-silent-rules \

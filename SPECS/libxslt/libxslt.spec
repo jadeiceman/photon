@@ -24,7 +24,7 @@ Header files for doing development with libxslt.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

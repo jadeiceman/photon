@@ -24,7 +24,7 @@ It contains the libraries and header files to create applications
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--disable-silent-rules
 make SHLIB_LIBS=-lncurses

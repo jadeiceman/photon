@@ -24,7 +24,7 @@ and formatting text.
 %prep
 %setup -q
 %build
-PAGE=letter ./configure \
+PAGE=letter %configure \
 	--prefix=%{_prefix} \
 	--with-grofferdir=%{_datadir}/%{name}/%{version}/groffer
 make

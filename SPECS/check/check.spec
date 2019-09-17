@@ -17,7 +17,7 @@ so both assertion failures and code errors that cause segmentation faults or oth
 %setup -q
 %build
 autoreconf --install
-./configure --prefix=%{_prefix}
+%configure --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

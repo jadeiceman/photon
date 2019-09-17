@@ -37,7 +37,7 @@ unbound dns server docs
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

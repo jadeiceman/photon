@@ -16,7 +16,7 @@ Terminal multiplexer
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install

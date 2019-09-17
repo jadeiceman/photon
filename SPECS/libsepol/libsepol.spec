@@ -63,7 +63,7 @@ rm -rf %{buildroot}%{_mandir}/man8
 
 %check
 pushd CUnit-2.1-2/
-./configure --prefix=/usr
+%configure --prefix=/usr
 make
 make install
 popd

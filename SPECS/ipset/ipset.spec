@@ -33,7 +33,7 @@ Libraries and header files for ipset.
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

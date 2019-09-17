@@ -29,7 +29,7 @@ developing applications that use liblogging.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--disable-journal
 make %{?_smp_mflags}

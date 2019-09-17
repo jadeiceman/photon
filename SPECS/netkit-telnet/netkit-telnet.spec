@@ -31,7 +31,7 @@ sed -i 's/install -s/install/' telnet/Makefile
 sed -i 's/install -s/install/' telnetd/Makefile
 sed -i '/#include <termios.h>/{s/.*/&\n#include <stdlib.h>\n#include <string.h>/;:a;n;ba}' telnet/externs.h
 sed -i '/#include <stdlib.h>/{s/.*/&\n#include <string.h>/;:a;n;ba}' telnet/netlink.cc
-./configure --installroot=%{buildroot}
+%configure --installroot=%{buildroot}
 
 make
 

@@ -23,7 +23,7 @@ The Iputils package contains programs for basic networking.
 make %{?_smp_mflags} USE_IDN=no USE_GCRYPT=yes
 (
 cd ninfod
-./configure --prefix=%{_prefix} 
+%configure --prefix=%{_prefix} 
 make %{?_smp_mflags} 
 )
 #make html

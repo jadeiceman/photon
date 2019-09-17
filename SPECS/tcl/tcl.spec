@@ -34,7 +34,7 @@ Headers and development libraries for tcl
 
 %build
 cd unix
-./configure \
+%configure \
        --prefix=%{_prefix}  \
        --mandir=%{_mandir}  \
        --enable-threads     \

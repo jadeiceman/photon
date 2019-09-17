@@ -37,7 +37,7 @@ autoreconf -fi
 pushd saslauthd
 autoreconf -fi
 popd
-./configure \
+%configure \
     CFLAGS="%{optflags} -fPIC" \
     CXXFLAGS="%{optflags}" \
     --prefix=%{_prefix} \

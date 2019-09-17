@@ -36,7 +36,7 @@ Headers and development libraries for dejagnu
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix}
 make %{?_smp_mflags}
 

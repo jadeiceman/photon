@@ -24,7 +24,7 @@ developing applications that use libestr.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix}
 make %{?_smp_mflags}
 %install

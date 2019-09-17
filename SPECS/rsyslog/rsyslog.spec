@@ -36,7 +36,7 @@ It offers high-performance, great security features and a modular design. While 
 autoreconf -fvi
 %build
 sed -i 's/libsystemd-journal/libsystemd/' configure
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --enable-relp \
     --enable-gnutls\

@@ -43,7 +43,7 @@ These are library files of util-linux.
 %setup -q
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
 %build
-./configure \
+%configure \
     --disable-nologin \
     --disable-silent-rules \
     --disable-static \

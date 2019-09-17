@@ -25,7 +25,7 @@ FSArchiver is a system tool that allows you to save the contents of a file-syste
 #make some fixes required by glibc-2.28:
 sed -i '/unistd/a #include <sys/sysmacros.h>' src/filesys.c
 sed -i '/unistd/a #include <sys/sysmacros.h>' src/devinfo.c
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=/bin \
     --disable-silent-rules \

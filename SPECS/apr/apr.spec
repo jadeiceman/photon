@@ -21,7 +21,7 @@ It contains the libraries and header files to create applications
 %prep
 %setup -q
 %build
-./configure --prefix=/usr \
+%configure --prefix=/usr \
         --includedir=%{_includedir}/apr-%{aprver} \
         --with-installbuilddir=%{_libdir}/apr/build-%{aprver} \
         --with-devrandom=/dev/urandom \

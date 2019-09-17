@@ -23,7 +23,7 @@ It contains the libraries and header files to create applications.
 %setup -q
 %patch0 -p1
 %build
-./configure --prefix=/usr "CFLAGS=-fPIC" \
+%configure --prefix=/usr "CFLAGS=-fPIC" \
 	--host=%{_host} --build=%{_build} \
             --mandir=%{_mandir}
 make %{?_smp_mflags}

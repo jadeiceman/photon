@@ -151,8 +151,8 @@ Lightwave Samples
 %prep
 
 %setup -qn lightwave-%{version}
-sed -i 's|/opt/vmware/bin/certool|/usr/bin/certool|' vmidentity/install/src/main/java/com/vmware/identity/configure/LinuxInstallerHelper.java
-sed -i 's|/opt/vmware/sbin/vmware-stsd.sh|/usr/sbin/vmware-stsd.sh|' vmidentity/install/src/main/java/com/vmware/identity/configure/LinuxInstallerHelper.java
+sed -i 's|/opt/vmware/bin/certool|/usr/bin/certool|' vmidentity/install/src/main/java/com/vmware/identit%configure/LinuxInstallerHelper.java
+sed -i 's|/opt/vmware/sbin/vmware-stsd.sh|/usr/sbin/vmware-stsd.sh|' vmidentity/install/src/main/java/com/vmware/identit%configure/LinuxInstallerHelper.java
 sed -i 's/VMIDENTITY_LIB_DIR=\/opt\/vmware\/lib64/VMIDENTITY_LIB_DIR=\/usr\/jars/' vmidentity/websso/src/main/resources/sso-config.sh
 sed -i 's,/opt/vmware/bin/ic-join,/usr/bin/ic-join,' config/scripts/domainjoin.sh
 sed -i 's#$COMMONS_DAEMON_HOME#usr#g' configure.ac
@@ -161,7 +161,7 @@ sed -i 's#$COMMONS_DAEMON_HOME#usr#g' configure.ac
 
 cd build
 autoreconf -mif .. &&
-../configure \
+.%configure \
     CFLAGS="-Wall -Werror -Wno-unused-but-set-variable -Wno-pointer-sign -Wno-implicit-function-declaration -Wno-address -Wno-enum-compare" \
     LDFLAGS=-ldl \
     --prefix=%{_prefix} \
@@ -354,7 +354,7 @@ mkdir -p %{buildroot}/opt/vmware/share/config
             %{_likewise_open_bindir}/lwsm -q refresh
             sleep 5
 
-            %{_sbindir}/configure-build.sh "%{_vmsts_dbdir}"
+            %{_sbindir%configure-build.sh "%{_vmsts_dbdir}"
 
             # Remove the cached lightwaveui directory if no corresponding war file is found
             ROOTDIR="/opt/vmware/vmware-sts/webapps"
@@ -1057,12 +1057,12 @@ mkdir -p %{buildroot}/opt/vmware/share/config
 
 %defattr(-,root,root,0755)
 
-%{_bindir}/configure-sts
+%{_bindir%configure-sts
 
 %{_sbindir}/vmware-stsd.sh
-%{_sbindir}/configure-build.sh
+%{_sbindir%configure-build.sh
 %{_sbindir}/sso-config.sh
-%{_sbindir}/configure-pwd-policy.sh
+%{_sbindir%configure-pwd-policy.sh
 
 %{_configdir}/idm/*
 
@@ -1120,7 +1120,7 @@ mkdir -p %{buildroot}/opt/vmware/share/config
 %defattr(-,root,root,0755)
 
 %{_bindir}/ic-promote
-%{_bindir}/configure-lightwave-server
+%{_bindir%configure-lightwave-server
 %{_bindir}/test-ldapbind
 %{_bindir}/test-logon
 %{_bindir}/test-svr

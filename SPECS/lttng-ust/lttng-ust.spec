@@ -30,7 +30,7 @@ The libraries and header files needed for LTTng-UST development.
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--docdir=%{_docdir}/%{name} \
 	--disable-static

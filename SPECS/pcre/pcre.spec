@@ -36,7 +36,7 @@ This package contains minimal set of shared pcre libraries.
 %prep
 %setup -q
 %build
-./configure --prefix=/usr                     \
+%configure --prefix=/usr                     \
             --docdir=/usr/share/doc/pcre-%{version} \
             --enable-unicode-properties       \
             --enable-pcre16                   \

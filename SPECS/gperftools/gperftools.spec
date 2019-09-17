@@ -29,7 +29,7 @@ The contains gperftools package doc files.
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--docdir=%{_defaultdocdir}/%{name}-%{version}
 make %{?_smp_mflags}

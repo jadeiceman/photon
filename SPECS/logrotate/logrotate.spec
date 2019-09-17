@@ -17,7 +17,7 @@ The logrotate utility is designed to simplify the administration of log files on
 %setup -q
 %build
 ./autogen.sh
-./configure \
+%configure \
 	--prefix=%{_prefix}
 # logrotate code has misleading identation and GCC 6.3 does not like it.
 make %{?_smp_mflags} CFLAGS="-Wno-error=misleading-indentation -g -O2"

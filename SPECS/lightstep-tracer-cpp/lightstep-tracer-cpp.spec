@@ -29,7 +29,7 @@ LightStep distributed tracing library for C++.
 %patch0 -p1
 
 %build
-./configure                     \
+%configure                     \
         --disable-silent-rules  \
         --prefix=%{_prefix}     \
         --disable-static        \

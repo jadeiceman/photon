@@ -49,7 +49,7 @@ The libraries and header files needed for libcap_ng development.
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --libdir=%{_libdir} \
     --with-python \

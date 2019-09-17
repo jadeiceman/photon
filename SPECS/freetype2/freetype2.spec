@@ -25,7 +25,7 @@ It contains the libraries and header files to create applications
 %setup -q -n freetype-%{version}
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--with-harfbuzz=no
 make %{?_smp_mflags}

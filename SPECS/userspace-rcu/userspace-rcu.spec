@@ -31,7 +31,7 @@ Library files for doing development with userspace-rcu.
 
 %build
 autoreconf -fiv
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --disable-static
 

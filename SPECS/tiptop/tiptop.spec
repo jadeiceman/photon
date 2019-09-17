@@ -24,7 +24,7 @@ such as conflicts between processes in a multicore environment.
 %setup -q
 
 %build
-./configure
+%configure
 make
 %install
 install -D  src/tiptop %{buildroot}%{_bindir}/tiptop

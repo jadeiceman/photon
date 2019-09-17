@@ -29,7 +29,7 @@ flex.
 sed -i -e '/test-bison/d' tests/Makefile.in
 %build
 CFLAGS="-D_GNU_SOURCE" \
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules

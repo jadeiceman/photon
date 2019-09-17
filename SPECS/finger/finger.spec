@@ -43,7 +43,7 @@ system at the moment or a person.
 %build
 sed -i 's/install -s/install/' finger/Makefile
 sed -i 's/install -s/install/' fingerd/Makefile
-./configure \
+%configure \
 	--prefix=%{_prefix}
 
 make %{?_smp_mflags}

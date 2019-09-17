@@ -21,7 +21,7 @@ downloading of files from the Web.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
     --disable-silent-rules \

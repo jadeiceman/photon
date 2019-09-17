@@ -19,7 +19,7 @@ AsciiDoc is a human readable text document format that can be easily converted t
 
 %build
 export CFLAGS="%{optflags}"
-./configure  --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
+%configure  --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
 
 make %{?_smp_mflags}
 

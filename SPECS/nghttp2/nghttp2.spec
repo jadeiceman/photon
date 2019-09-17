@@ -33,7 +33,7 @@ These are the header files of nghttp2.
 %setup -q
 
 %build
-./configure --prefix=%{_prefix}        \
+%configure --prefix=%{_prefix}        \
             --disable-static           \
             --enable-lib-only          \
             --disable-python-bindings 

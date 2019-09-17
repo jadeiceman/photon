@@ -28,7 +28,7 @@ sed -i 's#$(LIBRARY) ##' config/rules.mk
 
 %build
 cd nspr
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --with-mozilla \

@@ -25,7 +25,7 @@ Development files for jansson
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --disable-static
 make %{?_smp_mflags}

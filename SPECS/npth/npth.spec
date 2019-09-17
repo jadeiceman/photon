@@ -30,7 +30,7 @@ Development package for npth.
 
 %build
 ./autogen.sh
-./configure --disable-static \
+%configure --disable-static \
            --prefix=%{_prefix}
 make
 

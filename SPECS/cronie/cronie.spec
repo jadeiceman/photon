@@ -27,7 +27,7 @@ sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/
      s/^\s*account\s*include\s*password-auth$/account    include    system-account/g;
      s/^\s*session\s*include\s*password-auth$/session    include    system-session/g;' pam/crond
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --sysconfdir=/etc   \
     --localstatedir=/var\

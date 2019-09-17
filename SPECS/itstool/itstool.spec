@@ -25,7 +25,7 @@ to translate and how to chunk it into messages using the W3C Internationalizatio
 %prep
 %setup -q
 %build
-./configure --prefix=%{_prefix}
+%configure --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

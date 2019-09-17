@@ -30,7 +30,7 @@ These are the additional language files of coreutils.
 %setup -q
 %patch0 -p1
 %build
-export FORCE_UNSAFE_CONFIGURE=1 &&  ./configure \
+export FORCE_UNSAFE_CONFIGURE=1 &&  %configure \
 	--prefix=%{_prefix} \
 	--enable-no-install-program=kill,uptime \
 	--disable-silent-rules

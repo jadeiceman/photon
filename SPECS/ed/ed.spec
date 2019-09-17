@@ -19,7 +19,7 @@ GNU ed is a line-oriented text editor. It is used to create, display, modify and
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix}
 make V=1 %{?_smp_mflags}
 %install

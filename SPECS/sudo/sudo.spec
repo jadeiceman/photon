@@ -23,7 +23,7 @@ the ability to run some (or all) commands as root or another user while logging 
 %setup -q
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libexecdir=%{_libdir} \

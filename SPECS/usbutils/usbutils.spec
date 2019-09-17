@@ -24,7 +24,7 @@ about USB buses in the system and the devices connected to them.
 %setup -q -n %{name}-%{version}
 
 %build
-./configure --prefix=/usr \
+%configure --prefix=/usr \
             --datadir=/usr/share/misc \
             --disable-zlib &&
 make %{?_smp_mflags}

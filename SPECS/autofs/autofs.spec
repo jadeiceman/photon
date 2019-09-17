@@ -23,7 +23,7 @@ Automounting is the process of automatically mounting and unmounting of file sys
 %setup -q
 
 %build
-./configure --prefix=/usr           \
+%configure --prefix=/usr           \
             --mandir=/usr/share/man \
 	    --with-libtirpc
 make %{?_smp_mflags}

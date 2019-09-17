@@ -33,7 +33,7 @@ another program was doing at the moment it crashed.
 %patch0 -p1
 
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --with-python=/usr/bin/python3
 make %{?_smp_mflags}

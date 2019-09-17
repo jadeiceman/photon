@@ -34,7 +34,7 @@ developing applications that use nettle.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--enable-shared \
         --disable-static

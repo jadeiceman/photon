@@ -38,7 +38,7 @@ This package includes header files and libraries necessary for developing progra
 %setup -q
 
 %build
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
+%configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
 sed '/stdlib.h/a#include <stdint.h>' -i src/xdr_sizeof.c
 
 make %{?_smp_mflags}

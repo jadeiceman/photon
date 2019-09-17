@@ -59,7 +59,7 @@ This contains development tools and libraries for libvirt.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --disable-silent-rules \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \

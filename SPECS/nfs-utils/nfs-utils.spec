@@ -49,7 +49,7 @@ find . -iname "*.py" | xargs -I file sed -i '1s/python/python3/g' file
 sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
 
 %build
-./configure --prefix=%{_prefix}         \
+%configure --prefix=%{_prefix}         \
             --sysconfdir=%{_sysconfdir} \
             --enable-libmount-mount     \
             --without-tcp-wrappers      \

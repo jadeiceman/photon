@@ -18,7 +18,7 @@ The Intltool is an internationalization tool used for extracting translatable st
 %prep
 %setup -q
 %build
-./configure --prefix=%{_prefix}
+%configure --prefix=%{_prefix}
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

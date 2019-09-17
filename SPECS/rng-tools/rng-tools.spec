@@ -19,7 +19,7 @@ The rng-tools is a set of utilities related to random number generation in kerne
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix}
 make %{?_smp_mflags}
 

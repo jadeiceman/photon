@@ -28,7 +28,7 @@ LTTng is an open source tracing framework for Linux.
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--disable-lttng-ust
 

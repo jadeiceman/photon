@@ -23,7 +23,7 @@ These are the additional language files of grep
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--bindir=/bin \
 	--disable-silent-rules

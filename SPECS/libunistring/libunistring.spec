@@ -23,7 +23,7 @@ developing applications that use libunistring.
 %prep
 %setup -q
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix}
 make %{?_smp_mflags}
 %install

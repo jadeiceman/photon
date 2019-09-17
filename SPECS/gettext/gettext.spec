@@ -19,7 +19,7 @@ messages in the user's native language.
 %setup -q
 
 %build
-./configure \
+%configure \
 	--prefix=%{_prefix} \
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules

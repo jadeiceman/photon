@@ -68,7 +68,7 @@ It contains the libraries and header files to create applications.
 %build
 touch ChangeLog
 autoreconf -i
-sh ./configure --prefix=/usr --without-x --without-kernel-modules --without-icu --disable-static --with-tirpc
+sh %configure --prefix=/usr --without-x --without-kernel-modules --without-icu --disable-static --with-tirpc
 make %{?_smp_mflags}
 %install
 

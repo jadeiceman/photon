@@ -27,7 +27,7 @@ Libraries and header files for libatomic_ops library.
 %prep
 %setup -q
 %build
-./configure --prefix=%{_prefix}      \
+%configure --prefix=%{_prefix}      \
             --bindir=%{_sbindir}     \
             --enable-shared \
             --disable-silent-rules

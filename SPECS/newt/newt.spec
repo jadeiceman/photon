@@ -34,7 +34,7 @@ It contains the libraries and header files to create applications
 %setup -q -n %{name}-%{version}
 
 %build
-./configure --prefix=/usr \
+%configure --prefix=/usr \
             --with-gpm-support \
             --without-python \
             --disable-static

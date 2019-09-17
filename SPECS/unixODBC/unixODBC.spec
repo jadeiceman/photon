@@ -30,7 +30,7 @@ ODBC, you need to install this package.
 %setup -q
 
 %build
-./configure --prefix=/usr               \
+%configure --prefix=/usr               \
             --sysconfdir=/etc/%{name}   \
             --enable-threads=yes        \
             --enable-drivers=yes        \

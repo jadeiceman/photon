@@ -16,7 +16,7 @@ The bridge-utils package contains a utility needed to create and manage bridge d
 %setup -q
 %build
 autoconf
-./configure \
+%configure \
 	--prefix=%{_prefix}
 make %{?_smp_mflags}
 %install

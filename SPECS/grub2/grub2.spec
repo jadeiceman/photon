@@ -95,7 +95,7 @@ Additional library files for grub
 %ifarch x86_64
 mkdir build-for-pc
 pushd build-for-pc
-../configure \
+.%configure \
     --prefix=%{_prefix} \
     --sbindir=/sbin \
     --sysconfdir=%{_sysconfdir} \
@@ -113,7 +113,7 @@ popd
 
 mkdir build-for-efi
 pushd build-for-efi
-../configure \
+.%configure \
     --prefix=%{_prefix} \
     --sbindir=/sbin \
     --sysconfdir=%{_sysconfdir} \

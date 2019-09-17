@@ -30,7 +30,7 @@ These are the additional language files of procps-ng
 %prep
 %setup -q
 %build
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --exec-prefix= \
     --libdir=%{_libdir} \

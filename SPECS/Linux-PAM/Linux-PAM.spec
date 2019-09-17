@@ -35,7 +35,7 @@ for developing applications that use Linux-PAM.
 %setup -q
 %build
 
-./configure \
+%configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \

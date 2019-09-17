@@ -18,7 +18,7 @@ NSS module to read passwd/group files from alternate locations.
 %setup -q
 
 %build
-env CFLAGS='%{optflags}' ./configure --prefix=%{_prefix} --libdir=%{_libdir}
+env CFLAGS='%{optflags}' %configure --prefix=%{_prefix} --libdir=%{_libdir}
 
 make %{?_smp_mflags}
 
