@@ -1,6 +1,9 @@
+%global __os_install_post %{nil}
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
-
+%define linux_kernel_version 4.19.65
+%global _lib /lib
+ 
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
@@ -14,6 +17,8 @@ Source0:        http://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 %define sha1    glibc=ccb5dc9e51a9884df8488f86982439d47b283b2a
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
+Source3:        https://www.kernel.org/pub/linux/kernel/v4.x/linux-%{linux_kernel_version}.tar.xz
+%define sha1    linux=0fc8eeba8a8a710c95d71f140dfdc4bdff735248
 Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.25-fhs-1.patch
 Patch1:         glibc-2.24-bindrsvport-blacklist.patch
 Patch2:         0002-malloc-arena-fix.patch
@@ -106,14 +111,50 @@ chmod +x find_requires.sh
 #___EOF
 
 %build
-cd %{_builddir}/%{name}-build
-../%{name}-%{version}/configure \
+# DEBUG: echo macro values
+echo "_lib = %{_lib}"
+echo "_arch = %{_arch}"
+echo "_target = %{_target}"
+echo "_target_platform = %{_target_platform}"
+echo "_build_arch = %{_build_arch}"
+
+%if "%{_build}" !=  "%{_host}"
+echo ">>>>>> Cross compiling <<<<<<"
+%define cross_compile 1
+%endif
+
+CONFIGURE_OPTS="\
         --prefix=%{_prefix} \
         --disable-profile \
         --enable-kernel=3.2 \
         --enable-bind-now \
         --disable-experimental-malloc \
-        --disable-silent-rules
+        --disable-silent-rules \
+%if %{?cross_compile}
+        --build=$MACHTYPE \
+        --host=%{_host} \
+        --target=%{_host} \
+%endif
+%ifarch arm
+        --with-arch=armv7a \
+        --with-fpu=vfp \
+        --with-float=hard \
+        --with-headers=/target-%{_arch}/usr/include
+%endif 
+"
+
+%if %{?cross_compile}
+cd %{_builddir}/linux-%{linux_kernel_version} && \
+make mrproper && \
+make ARCH=%{_arch} headers_check && \
+make ARCH=%{_arch} \
+     INSTALL_HDR_PATH=/target-%{_arch}%{_prefix} \
+     headers_install
+%endif
+
+cd %{_builddir}/%{name}-build
+../%{name}-%{version}/configure \
+       $CONFIGURE_OPTS
 
 # Sometimes we have false "out of memory" make error
 # just rerun/continue make to workaroung it.
@@ -159,11 +200,16 @@ EOF
 popd
 %find_lang %{name} --all-name
 pushd localedata
+
+%if %{cross_compile} == 0
 # Generate out of locale-archive an (en_US.) UTF-8 locale
 mkdir -p %{buildroot}/usr/lib/locale
-I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
+I18NPATH=. GCONV_PATH=%{_builddir}/glibc-build/iconvdata LC_ALL=C %{_builddir}/glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A %{builddir}/%{name}-%{version}/intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
 mv %{buildroot}/usr/lib/locale/en_US.utf8 %{buildroot}/usr/lib/locale/en_US.UTF-8
+%endif
+
 popd
+
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}/usr/bin/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}/usr/bin/tzselect
@@ -197,19 +243,23 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files
 %defattr(-,root,root)
+%if %{cross_compile} == 0
 %{_libdir}/locale/*
+%config(missingok,noreplace) %{_sysconfdir}/ld.so.cache
+%endif
 %dir %{_sysconfdir}/ld.so.conf.d
 %config(noreplace) %{_sysconfdir}/nsswitch.conf
 %config(noreplace) %{_sysconfdir}/ld.so.conf
 %config(noreplace) %{_sysconfdir}/rpc
-%config(missingok,noreplace) %{_sysconfdir}/ld.so.cache
 %config %{_sysconfdir}/locale-gen.conf
-/lib64/*
+#/lib64/*
+%{_lib}/*
 %ifarch aarch64
 %exclude /lib
 %endif
 %exclude /lib64/libpcprofile.so
-%{_lib64dir}/*.so
+#{_lib64dir}/*.so
+%{_libdir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
 %{_bindir}/*
@@ -230,7 +280,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files iconv
 %defattr(-,root,root)
-%{_lib64dir}/gconv/*
+%{_libdir}/gconv/*
 /usr/bin/iconv
 /usr/sbin/iconvconfig
 
@@ -246,8 +296,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 /usr/sbin/zdump
 /usr/sbin/zic
 /sbin/sln
-%{_lib64dir}/audit/*
-/lib64/libpcprofile.so
+%{_libdir}/audit/*
+#/lib64/libpcprofile.so
+%{_lib}/libpcprofile.so
 
 %files nscd
 %defattr(-,root,root)
@@ -268,8 +319,8 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
-%{_lib64dir}/*.a
-%{_lib64dir}/*.o
+%{_libdir}/*.a
+%{_libdir}/*.o
 %{_includedir}/*
 
 %files -f %{name}.lang lang
