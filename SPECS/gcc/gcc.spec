@@ -93,11 +93,19 @@ This package contains development headers and static library for libgomp
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
+# bypass -rdynamic check
+sed -i '14593,14594 s/^/#/' libcc1/configure
+sed -i '14597,14600 s/^/#/' libcc1/configure
+
 %build
 
 export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
 
-SED=sed \
+export GCC_FOR_TARGET="%{_host}-gcc"
+export CC_FOR_TARGET="%{_host}-gcc"
+export CXX_FOR_TARGET="%{_host}-c++"
+
+export SED=sed
 %configure \
     --enable-shared \
     --enable-threads=posix \
