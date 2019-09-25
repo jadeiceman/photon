@@ -98,6 +98,12 @@ sed -i '14593,14594 s/^/#/' libcc1/configure
 sed -i '14597,14600 s/^/#/' libcc1/configure
 
 %build
+%global libdir %{_lib64dir}
+%ifarch arm
+%global libdir %{_libdir}
+echo "libdir = %{libdir}"
+%endif
+
 export glibcxx_cv_c99_math_cxx98=yes glibcxx_cv_c99_math_cxx11=yes
 
 # Point target compilers to cross compilers
@@ -134,8 +140,8 @@ install -vdm 755 %{buildroot}/%_lib
 ln -sv %{_bindir}/cpp %{buildroot}/%{_lib}
 ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
-mv -v %{buildroot}%{_libdir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
-chmod 755 %{buildroot}/%{_libdir}/libgcc_s.so.1
+mv -v %{buildroot}%{libdir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_lib}
+chmod 755 %{buildroot}/%{libdir}/libgcc_s.so.1
 rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
@@ -154,7 +160,6 @@ make %{?_smp_mflags} check-gcc
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%ifarch x86_64
 %files -f %{name}.lang
 %defattr(-,root,root)
 %{_lib}/cpp
@@ -162,78 +167,8 @@ make %{?_smp_mflags} check-gcc
 %exclude %{_bindir}/*gfortran
 %{_bindir}/*
 #   Libraries
-%{_lib64dir}/*
-%exclude %{_libexecdir}/gcc/%{_arch}-unknown-linux-gnu/%{version}/f951
-%{_libdir}/gcc/*
-#   Library executables
-%{_libexecdir}/gcc/*
-#   Man pages
-%{_mandir}/man1/gcov.1.gz
-%{_mandir}/man1/gcov-dump.1.gz
-%{_mandir}/man1/gcov-tool.1.gz
-%{_mandir}/man1/gcc.1.gz
-%{_mandir}/man1/g++.1.gz
-%{_mandir}/man1/cpp.1.gz
-%{_mandir}/man7/*.gz
-%{_datadir}/gdb/*
-
-%exclude %{_lib64dir}/libgcc*
-%exclude %{_lib64dir}/libstdc++*
-%exclude %{_lib64dir}/libgomp*
-
-%files -n     gfortran
-%defattr(-,root,root)
-%{_bindir}/*gfortran
-%{_mandir}/man1/gfortran.1.gz
-%{_libexecdir}/gcc/%{_arch}-unknown-linux-gnu/%{version}/f951
-
-%files -n libgcc
-%defattr(-,root,root)
-%{_lib64dir}/libgcc_s.so.*
-
-%files -n libgcc-atomic
-%defattr(-,root,root)
-%{_lib64dir}/libatomic.so*
-
-%files -n libgcc-devel
-%defattr(-,root,root)
-%{_lib64dir}/libgcc_s.so
-
-
-%files -n libstdc++
-%defattr(-,root,root)
-%{_lib64dir}/libstdc++.so.*
-%dir %{_datarootdir}/gcc-%{version}/python/libstdcxx
-%{_datarootdir}/gcc-%{version}/python/libstdcxx/*
-
-%files -n libstdc++-devel
-%defattr(-,root,root)
-%{_lib64dir}/libstdc++.so
-%{_lib64dir}/libstdc++.la
-%{_lib64dir}/libstdc++.a
-
-%{_includedir}/c++/*
-
-%files -n libgomp
-%defattr(-,root,root)
-%{_lib64dir}/libgomp*.so.*
-
-%files -n libgomp-devel
-%defattr(-,root,root)
-%{_lib64dir}/libgomp.a
-%{_lib64dir}/libgomp.la
-%{_lib64dir}/libgomp.so
-%{_lib64dir}/libgomp.spec
-%endif
-
-%ifarch arm
-%files -f %{name}.lang
-%defattr(-,root,root)
-#   Executables
-%exclude %{_bindir}/*gfortran
-%{_bindir}/*
-#   Libraries
-%{_libdir}/*
+%exclude %{libdir}/debug 
+%{libdir}/*
 %exclude %{_libexecdir}/gcc/%{_host}/%{version}/f951
 %{_libdir}/gcc/*
 #   Library executables
@@ -248,9 +183,9 @@ make %{?_smp_mflags} check-gcc
 %{_mandir}/man7/*.gz
 %{_datadir}/gdb/*
 
-%exclude %{_libdir}/libgcc*
-%exclude %{_libdir}/libstdc++*
-%exclude %{_libdir}/libgomp*
+%exclude %{libdir}/libgcc*
+%exclude %{libdir}/libstdc++*
+%exclude %{libdir}/libgomp*
 
 %files -n     gfortran
 %defattr(-,root,root)
@@ -260,42 +195,41 @@ make %{?_smp_mflags} check-gcc
 
 %files -n libgcc
 %defattr(-,root,root)
-%{_libdir}/libgcc_s.so.*
+%{libdir}/libgcc_s.so.*
 
 %files -n libgcc-atomic
 %defattr(-,root,root)
-%{_libdir}/libatomic.so*
+%{libdir}/libatomic.so*
 
 %files -n libgcc-devel
 %defattr(-,root,root)
-%{_libdir}/libgcc_s.so
+%{libdir}/libgcc_s.so
 
 
 %files -n libstdc++
 %defattr(-,root,root)
-%{_libdir}/libstdc++.so.*
+%{libdir}/libstdc++.so.*
 %dir %{_datarootdir}/gcc-%{version}/python/libstdcxx
 %{_datarootdir}/gcc-%{version}/python/libstdcxx/*
 
 %files -n libstdc++-devel
 %defattr(-,root,root)
-%{_libdir}/libstdc++.so
-%{_libdir}/libstdc++.la
-%{_libdir}/libstdc++.a
+%{libdir}/libstdc++.so
+%{libdir}/libstdc++.la
+%{libdir}/libstdc++.a
 
 %{_includedir}/c++/*
 
 %files -n libgomp
 %defattr(-,root,root)
-%{_libdir}/libgomp*.so.*
+%{libdir}/libgomp*.so.*
 
 %files -n libgomp-devel
 %defattr(-,root,root)
-%{_libdir}/libgomp.a
-%{_libdir}/libgomp.la
-%{_libdir}/libgomp.so
-%{_libdir}/libgomp.spec
-%endif
+%{libdir}/libgomp.a
+%{libdir}/libgomp.la
+%{libdir}/libgomp.so
+%{libdir}/libgomp.spec
 
 %changelog
 *   Fri Nov 02 2018 Alexey Makhalov <amakhalov@vmware.com> 7.3.0-4

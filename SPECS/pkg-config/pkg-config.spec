@@ -23,13 +23,30 @@ cd glib  # patches need to apply to internal glib
 %patch1 -p1
 cd ..
 
+# Preset compile options for cross-compiling
+%if "%{_host}" != "%{_build}"
+%global cross_compile 1
+echo ac_cv_type_long_long=yes>%{_arch}-linux.cache
+echo glib_cv_stack_grows=no>>%{_arch}-linux.cache
+echo glib_cv_uscore=no>>%{_arch}-linux.cache
+echo ac_cv_func_posix_getpwuid_r=yes>>%{_arch}-linux.cache
+echo ac_cv_func_posix_getgrgid_r=yes>>%{_arch}-linux.cache
+%endif
+
 %build
-%configure \
+
+CONFIGURE_OPTS="\
 	--prefix=%{_prefix} \
-	--with-internal-glib \
-	--disable-host-tool \
-	--docdir=%{_defaultdocdir}/%{name}-%{version} \
-	--disable-silent-rules
+        --with-internal-glib \
+        --disable-host-tool \
+        --docdir=%{_defaultdocdir}/%{name}-%{version} \
+        --disable-silent-rules \
+%if %{?cross_compile}
+	--cache-file=%{_arch}-linux.cache \
+%endif
+"
+
+%configure $CONFIGURE_OPTS
 make %{?_smp_mflags}
 
 %install
