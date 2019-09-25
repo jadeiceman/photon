@@ -167,7 +167,7 @@ make %{?_smp_mflags} check-gcc
 %exclude %{_bindir}/*gfortran
 %{_bindir}/*
 #   Libraries
-%exclude %{libdir}/debug 
+%exclude %{libdir}/debug
 %{libdir}/*
 %exclude %{_libexecdir}/gcc/%{_host}/%{version}/f951
 %{_libdir}/gcc/*
