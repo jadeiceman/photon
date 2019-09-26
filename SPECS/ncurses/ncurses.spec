@@ -37,7 +37,7 @@ Summary:        Header and development files for ncurses
 Requires:       %{name} = %{version}-%{release}
 Provides:       pkgconfig(ncurses)
 %description    devel
-It contains the libraries and header files to create applications 
+It contains the libraries and header files to create applications
 
 %package        terminfo
 Summary:        terminfo files for ncurses
@@ -47,39 +47,46 @@ It contains all terminfo files
 
 %prep
 %setup -q -n %{name}-%{version}-%{ncursessubversion}
+sed -i '3126 s/^/#/' configure
 
 %build
-mkdir v6
-pushd v6
-ln -s ../configure .
-./configure \
-    --prefix=%{_prefix} \
-    --mandir=%{_mandir} \
+
+CONFIGURE_OPTS_V6="\
     --with-shared \
     --without-debug \
     --enable-pc-files \
     --enable-widec \
     --disable-lp64 \
-    --with-chtype='long' \
-    --with-mmask-t='long' \
-    --disable-silent-rules
+    --with-chtype=long \
+    --with-mmask-t=long \
+    --disable-silent-rules \
+%ifarch arm
+    --disable-stripping \
+%endif
+"
+
+CONFIGURE_OPTS_V5="\
+    --with-shared \
+    --without-debug \
+    --enable-pc-files \
+    --enable-widec \
+    --disable-lp64 \
+    --with-chtype=long \
+    --with-mmask-t=long \
+    --disable-silent-rules \
+    --with-abi-version=5 \
+"
+
+mkdir v6
+pushd v6
+ln -s ../configure .
+%configure $CONFIGURE_OPTS_V6
 make %{?_smp_mflags}
 popd
 mkdir v5
 pushd v5
 ln -s ../configure .
-./configure \
-    --prefix=%{_prefix} \
-    --mandir=%{_mandir} \
-    --with-shared \
-    --without-debug \
-    --enable-pc-files \
-    --enable-widec \
-    --disable-lp64 \
-    --with-chtype='long' \
-    --with-mmask-t='long' \
-    --disable-silent-rules \
-    --with-abi-version=5
+%configure $CONFIGURE_OPTS_V5
 make %{?_smp_mflags}
 popd
 %install
@@ -106,7 +113,7 @@ cp -v -R doc/* %{buildroot}%{_defaultdocdir}/%{name}-%{version}
 
 %check
 cd test
-./configure
+%configure
 make
 
 %post libs -p /sbin/ldconfig

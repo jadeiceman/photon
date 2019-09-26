@@ -76,6 +76,7 @@ Name Service Cache Daemon
 
 %prep
 %setup -q
+%setup -T -D -q -b 3
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 %patch0 -p1
 %patch1 -p1
@@ -117,17 +118,11 @@ chmod +x find_requires.sh
 %endif
 
 CONFIGURE_OPTS="\
-        --prefix=%{_prefix} \
         --disable-profile \
         --enable-kernel=3.2 \
         --enable-bind-now \
         --disable-experimental-malloc \
         --disable-silent-rules \
-%if %{?cross_compile}
-        --build=$MACHTYPE \
-        --host=%{_host} \
-        --target=%{_host} \
-%endif
 %ifarch arm
         --with-arch=armv7a \
         --with-fpu=vfp \
@@ -145,9 +140,9 @@ make ARCH=%{_arch} \
      headers_install
 %endif
 
+%define _configure ../%{name}-%{version}/configure
 cd %{_builddir}/%{name}-build
-../%{name}-%{version}/configure \
-       $CONFIGURE_OPTS
+%configure $CONFIGURE_OPTS
 
 # Sometimes we have false "out of memory" make error
 # just rerun/continue make to workaroung it.
