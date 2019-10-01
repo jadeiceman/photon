@@ -16,17 +16,23 @@ BuildRequires:  dejagnu
 
 %description
 The libffi library provides a portable, high level programming interface
-to various calling conventions. This allows a programmer to call any 
+to various calling conventions. This allows a programmer to call any
 function specified by a call interface description at run time.
 
 %package    devel
 Summary:    Header and development files for libffi
 Requires:   %{name} = %{version}-%{release}
 %description    devel
-It contains the libraries and header files to create applications 
+It contains the libraries and header files to create applications
 
 %prep
 %setup -q
+
+%ifarch arm
+%define libdir %{_libdir}
+%else
+%define libdir %{_lib64dir}
+%endif
 
 %build
 sed -e '/^includesdir/ s:$(libdir)/@PACKAGE_NAME@-@PACKAGE_VERSION@/include:$(includedir):' \
@@ -46,7 +52,7 @@ make %{?_smp_mflags}
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make DESTDIR=%{buildroot} install
 install -D -m644 LICENSE %{buildroot}/usr/share/licenses/%{name}/LICENSE
-find %{buildroot}/%{_lib64dir} -name '*.la' -delete
+find %{buildroot}/%{libdir} -name '*.la' -delete
 rm -rf %{buildroot}/%{_infodir}
 %{_fixperms} %{buildroot}/*
 
@@ -60,7 +66,7 @@ rm -rf %{buildroot}/*
 
 %files
 %defattr(-,root,root)
-%{_lib64dir}/*.so*
+%{libdir}/*.so*
 
 %files devel
 %defattr(-,root,root)

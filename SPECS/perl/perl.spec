@@ -52,9 +52,22 @@ cp -r ../perl-cross-%{perl_cross_version}/* . -v
 %endif
 
 %build
+%define pager -Dpager=%{_bindir}"/less -isR"
 export BUILD_ZLIB=False
 export BUILD_BZIP2=0
 CFLAGS="%{_optflags}"
+
+CONFIGURE_OPTS="\
+    -Dprefix=%{_prefix} \
+    -Dvendorprefix=%{_prefix} \
+    -Dman1dir=%{_mandir}/man1 \
+    -Dman3dir=%{_mandir}/man3 \
+    -Duseshrplib \
+    -Dusethreads \
+    -DPERL_RANDOM_DEVICE=/dev/erandom \
+"
+
+%define configure_opts $CONFIGURE_OPTS %{pager}
 
 %if %{?cross_compile}
 export CC="%{_host}-gcc"
@@ -65,27 +78,15 @@ export RANLIB="%{_host}-ranlib"
 export LD="%{_host}-ld"
 export STRIP="%{_host}-strip"
 
-./configure \
-    -Dvendorprefix=%{_prefix} \
-    -Dman1dir=%{_mandir}/man1 \
-    -Dman3dir=%{_mandir}/man3 \
-    -Dpager=%{_bindir}"/less -isR" \
-    -Duseshrplib \
-    -Dusethreads \
-    -DPERL_RANDOM_DEVICE="/dev/erandom" \
+# Override default configure macro because program-prefix is not valid argument
+%define configure ./configure
+
+%configure %{configure_opts} \
     --target=%{_host} \
     --host=%{_host} \
     --build=$MACHTYPE
 %else
-sh Configure -des \
-    -Dprefix=%{_prefix} \
-    -Dvendorprefix=%{_prefix} \
-    -Dman1dir=%{_mandir}/man1 \
-    -Dman3dir=%{_mandir}/man3 \
-    -Dpager=%{_bindir}"/less -isR" \
-    -Duseshrplib \
-    -Dusethreads \
-    -DPERL_RANDOM_DEVICE="/dev/erandom"
+sh Configure -des %{configure_opts}
 %endif
 
 make VERBOSE=1 %{?_smp_mflags}

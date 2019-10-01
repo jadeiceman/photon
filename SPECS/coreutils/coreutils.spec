@@ -28,7 +28,7 @@ These are the additional language files of coreutils.
 
 %prep
 %setup -q
-%patch0 -p1
+#%patch0 -p1
 %build
 export FORCE_UNSAFE_CONFIGURE=1 &&  %configure \
 	--enable-no-install-program=kill,uptime \
