@@ -102,9 +102,9 @@ cd $builddir/build-gcc-%{target_arch} && \
 $builddir/gcc-%{version}/configure \
     --prefix=%{_prefix} \
     --target=%{target_arch} \
-	--with-arch=%{target_gcc_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
+    --with-arch=%{target_gcc_arm_arch} \
+    --with-fpu=%{target_fpu} \
+    --with-float=%{target_float} \
     --with-sysroot=%{sysroot} \
     --enable-plugins \
     --enable-languages=c \
@@ -128,9 +128,9 @@ $builddir/glibc-%{glibc_version}/configure \
     --build=$MACHTYPE \
     --host=%{target_arch} \
     --target=%{target_arch} \
-	--with-arch=%{target_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
+    --with-arch=%{target_arm_arch} \
+    --with-fpu=%{target_fpu} \
+    --with-float=%{target_float} \
     --with-headers=%{sysroot}/usr/include \
     --disable-multilib \
     libc_cv_forced_unwind=yes && \
@@ -158,9 +158,9 @@ cd $builddir/build-gcc-%{target_arch} && \
 $builddir/gcc-%{version}/configure \
     --prefix=%{_prefix} \
     --target=%{target_arch} \
-	--with-arch=%{target_gcc_arm_arch} \
-	--with-fpu=%{target_fpu} \
-	--with-float=%{target_float} \
+    --with-arch=%{target_gcc_arm_arch} \
+    --with-fpu=%{target_fpu} \
+    --with-float=%{target_float} \
     --with-sysroot=%{sysroot} \
     --enable-shared \
     --enable-threads=posix \

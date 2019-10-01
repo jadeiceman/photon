@@ -44,7 +44,7 @@ These are the additional language files of bash.
     --bindir=/bin \
     --htmldir=%{_defaultdocdir}/%{name}-%{version} \
     --without-bash-malloc \
-    --with-installed-readline
+    --with-installed-readline=/target-%{_arch}
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

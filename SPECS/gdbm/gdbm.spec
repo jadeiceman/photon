@@ -34,7 +34,6 @@ It contains the libraries and header files to create applications.
 
 %build
 %configure \
-    --prefix=%{_prefix} \
     --enable-libgdbm-compat \
     --disable-silent-rules
 make %{?_smp_mflags}

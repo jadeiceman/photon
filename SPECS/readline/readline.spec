@@ -18,14 +18,13 @@ editing and history capabilities.
 Summary:	Header and development files for readline
 Requires:	%{name} = %{version}
 %description	devel
-It contains the libraries and header files to create applications 
+It contains the libraries and header files to create applications
 %prep
 %setup -q
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
 %build
 %configure \
-	--prefix=%{_prefix} \
 	--disable-silent-rules
 make SHLIB_LIBS=-lncurses
 %install
@@ -102,7 +101,7 @@ make %{?_smp_mflags} check
 -       Updated to version 7.0
 *       Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 6.3-6
 -       Move docs and man to the devel package
-*       Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
+*       Tue Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
 -       Modified %check
 *	Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.3-4
 -	GA - Bump release of all rpms

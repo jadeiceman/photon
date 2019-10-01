@@ -3,7 +3,7 @@
 %define glibc_target_cpu %{_build}
 %define linux_kernel_version 4.19.65
 %global _lib /lib
- 
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
@@ -18,7 +18,7 @@ Source0:        http://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
 Source3:        https://www.kernel.org/pub/linux/kernel/v4.x/linux-%{linux_kernel_version}.tar.xz
-%define sha1    linux=0fc8eeba8a8a710c95d71f140dfdc4bdff735248
+%define sha1    linux=598111781858ea0aaa328cfa0fec39264d2815d7
 Patch0:         http://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.25-fhs-1.patch
 Patch1:         glibc-2.24-bindrsvport-blacklist.patch
 Patch2:         0002-malloc-arena-fix.patch
@@ -76,6 +76,7 @@ Name Service Cache Daemon
 
 %prep
 %setup -q
+%setup -T -D -q -b 3
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 %patch0 -p1
 %patch1 -p1
@@ -111,36 +112,23 @@ chmod +x find_requires.sh
 #___EOF
 
 %build
-# DEBUG: echo macro values
-echo "_lib = %{_lib}"
-echo "_arch = %{_arch}"
-echo "_target = %{_target}"
-echo "_target_platform = %{_target_platform}"
-echo "_build_arch = %{_build_arch}"
 
 %if "%{_build}" !=  "%{_host}"
-echo ">>>>>> Cross compiling <<<<<<"
 %define cross_compile 1
 %endif
 
 CONFIGURE_OPTS="\
-        --prefix=%{_prefix} \
         --disable-profile \
         --enable-kernel=3.2 \
         --enable-bind-now \
         --disable-experimental-malloc \
         --disable-silent-rules \
-%if %{?cross_compile}
-        --build=$MACHTYPE \
-        --host=%{_host} \
-        --target=%{_host} \
-%endif
 %ifarch arm
         --with-arch=armv7a \
         --with-fpu=vfp \
         --with-float=hard \
         --with-headers=/target-%{_arch}/usr/include
-%endif 
+%endif
 "
 
 %if %{?cross_compile}
@@ -152,9 +140,9 @@ make ARCH=%{_arch} \
      headers_install
 %endif
 
+%define _configure ../%{name}-%{version}/configure
 cd %{_builddir}/%{name}-build
-../%{name}-%{version}/configure \
-       $CONFIGURE_OPTS
+%configure $CONFIGURE_OPTS
 
 # Sometimes we have false "out of memory" make error
 # just rerun/continue make to workaroung it.
