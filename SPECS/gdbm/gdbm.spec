@@ -33,6 +33,7 @@ It contains the libraries and header files to create applications.
 %setup -q
 
 %build
+export LDFLAGS="$LDFLAGS -L/target-%{_arch}/usr/lib"
 %configure \
     --enable-libgdbm-compat \
     --disable-silent-rules

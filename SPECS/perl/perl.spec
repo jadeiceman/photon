@@ -6,6 +6,8 @@
 # for F in $(find lib -type f); do perl -e '$/ = undef; $_ = <>; if (/^package #\R([\w:]*);/m) { print qq{|^perl\\\\($1\\\\)} }' "$F"; done
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}^perl\\(Locale::Codes::Country_Retired\\)|^perl\\(Locale::Codes::LangFam_Retired\\)|^perl\\(Locale::Codes::Script_Retired\\)|^perl\\(Locale::Codes::LangExt_Codes\\)|^perl\\(Locale::Codes::LangFam_Codes\\)|^perl\\(Locale::Codes::Script_Codes\\)|^perl\\(Locale::Codes::Language_Codes\\)|^perl\\(Locale::Codes::LangExt_Retired\\)|^perl\\(Locale::Codes::Currency_Codes\\)|^perl\\(Locale::Codes::LangVar_Retired\\)|^perl\\(Locale::Codes::Language_Retired\\)|^perl\\(Locale::Codes::Country_Codes\\)|^perl\\(Locale::Codes::LangVar_Codes\\)|^perl\\(Locale::Codes::Currency_Retired\\)
 
+%define perl_cross_version 1.3
+
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.28.0
@@ -16,6 +18,8 @@ Group:          Development/Languages
 Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        http://www.cpan.org/src/5.0/%{name}-%{version}.tar.gz
+%define sha1    perl=0622f86160e8969633cbd21a2cca9e11ae1f8c5a
+Source1:        https://github.com/arsv/perl-cross/releases/download/%{perl_cross_version}/perl-cross-%{perl_cross_version}.tar.gz
 %define sha1    perl=0622f86160e8969633cbd21a2cca9e11ae1f8c5a
 Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
@@ -32,14 +36,47 @@ Requires:       libgcc
 The Perl package contains the Practical Extraction and
 Report Language.
 %prep
+# Check for cross-compile
+%if "%{_build}" !=  "%{_host}"
+echo "Cross-compile detected (build: %{_build}, host: %{_host})"
+%global cross_compile 1
+%endif
+
 %setup -q
 sed -i 's/-fstack-protector/&-all/' Configure
+
+# Extract perl-cross if cross-compiling
+%if %{?cross_compile}
+%setup -T -D -q -b 1
+cp -r ../perl-cross-%{perl_cross_version}/* . -v
+%endif
 
 %build
 export BUILD_ZLIB=False
 export BUILD_BZIP2=0
 CFLAGS="%{_optflags}"
 
+%if %{?cross_compile}
+export CC="%{_host}-gcc"
+export CXX="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
+
+./configure \
+    -Dvendorprefix=%{_prefix} \
+    -Dman1dir=%{_mandir}/man1 \
+    -Dman3dir=%{_mandir}/man3 \
+    -Dpager=%{_bindir}"/less -isR" \
+    -Duseshrplib \
+    -Dusethreads \
+    -DPERL_RANDOM_DEVICE="/dev/erandom" \
+    --target=%{_host} \
+    --host=%{_host} \
+    --build=$MACHTYPE
+%else
 sh Configure -des \
     -Dprefix=%{_prefix} \
     -Dvendorprefix=%{_prefix} \
@@ -48,7 +85,8 @@ sh Configure -des \
     -Dpager=%{_bindir}"/less -isR" \
     -Duseshrplib \
     -Dusethreads \
-        -DPERL_RANDOM_DEVICE="/dev/erandom"
+    -DPERL_RANDOM_DEVICE="/dev/erandom"
+%endif
 
 make VERBOSE=1 %{?_smp_mflags}
 %install
