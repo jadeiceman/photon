@@ -39,10 +39,17 @@ This package contains minimal set of shared bzip2 libraries.
 sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
 sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
 
+%if "%{_build}" != "%{_host}"
+# Disable tests since they won't work on multiarch build
+cp Makefile{,.orig}
+sed -e "/^all:/s/ test//" Makefile.orig > Makefile
+%endif
+
 %build
-make VERBOSE=1 %{?_smp_mflags} -f Makefile-libbz2_so
+CC="CC=%{_host}-gcc"
+make VERBOSE=1 %{?_smp_mflags} -f Makefile-libbz2_so $CC
 make clean
-make VERBOSE=1 %{?_smp_mflags}
+make VERBOSE=1 %{?_smp_mflags} $CC
 
 %install
 make PREFIX=%{buildroot}/usr install

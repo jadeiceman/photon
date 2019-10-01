@@ -73,7 +73,7 @@ class PackageUtils(object):
     def installRPMSInOneShot(self, sandbox, arch):
         rpmInstallcmd = self.rpmBinary + " " + self.installRPMPackageOptions
         if constants.crossCompiling and arch == constants.targetArch:
-            rpmInstallcmd += " --ignorearch --noscripts --root /target-" + constants.targetArch
+            rpmInstallcmd += " --ignoreos --ignorearch --noscripts --root /target-" + constants.targetArch
 
         # TODO: Container sandbox might need  + self.forceRpmPackageOptions
         if self.noDepsRPMFilesToInstallInAOneShot != "":
