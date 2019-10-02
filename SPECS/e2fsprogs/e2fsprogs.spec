@@ -10,6 +10,7 @@ Distribution:   Photon
 Source0:        http://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
 %define sha1    e2fsprogs=bfe11b75fee61c4d3795ac27eea11f9f7843294b
 Requires:       %{name}-libs = %{version}-%{release}
+BuildRequires:  util-linux
 Conflicts:      toybox
 
 %description
@@ -38,9 +39,9 @@ These are the additional language files of e2fsprogs
 sed -i -e 's|^LD_LIBRARY_PATH.*|&:/tools/lib|' tests/test_config
 
 %build
-LIBS=-L/tools/lib \
-CFLAGS=-I/tools/include \
-PKG_CONFIG_PATH=/tools/lib/pkgconfig \
+export LIBS=-L/tools/lib
+export CFLAGS=-I/tools/include
+export PKG_CONFIG_PATH=/tools/lib/pkgconfig
 %configure \
     --with-root-prefix='' \
     --enable-elf-shlibs \
