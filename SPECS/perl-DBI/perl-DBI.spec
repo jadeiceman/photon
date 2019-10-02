@@ -63,7 +63,15 @@ for F in lib/DBI/W32ODBC.pm lib/Win32/DBIODBC.pm; do
 done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+export CC="%{_host}-gcc"
+export CXX="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
+
+perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" CC=$CC AR=$AR LD=$LD RANLIB=$RANLIB
 make
 
 %install
