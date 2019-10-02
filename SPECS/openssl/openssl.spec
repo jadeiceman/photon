@@ -69,6 +69,16 @@ tar xf %{SOURCE100} --no-same-owner -C ..
 :> %{SOURCE100}
 %endif
 export CFLAGS="%{optflags}"
+%ifarch arm
+./Configure linux-armv4 \
+    --prefix=/usr \
+    --libdir=lib \
+    --openssldir=/%{_sysconfdir}/ssl \
+    --cross-compile-prefix=%{_host}- \
+    shared \
+    zlib-dynamic \
+    -Wa,--noexecstack "${CFLAGS}"
+%else
 ./config \
     --prefix=/usr \
     --libdir=lib \
@@ -79,6 +89,7 @@ export CFLAGS="%{optflags}"
     fips --with-fipsdir=%{_builddir}/openssl-fips-2.0.9 \
 %endif
     -Wa,--noexecstack "${CFLAGS}" "${LDFLAGS}"
+%endif
 # does not support -j yet
 make
 %install
