@@ -43,12 +43,22 @@ These are library files of util-linux.
 %setup -q
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
 %build
-%configure \
+autoreconf -f -i
+
+CONFIGURE_OPTS="\
     --disable-nologin \
     --disable-silent-rules \
     --disable-static \
     --disable-use-tty-group \
-    --without-python
+    --without-python \
+    --bindir=/bin \
+    --libdir=/lib \
+    --sbindir=/sbin \
+%ifarch arm
+    LDFLAGS=-L/target-%{_arch}/usr/lib \
+%endif
+"
+%configure $CONFIGURE_OPTS
 make %{?_smp_mflags}
 
 %install
