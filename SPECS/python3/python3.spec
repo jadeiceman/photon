@@ -130,22 +130,76 @@ Requires: python3 = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%setup -q -n Python-%{version}
+%global python_dir Python-%{version}
+%global python_hostdir  %{_builddir}/PythonHost
+
+# Check if cross-compiling
+%if "%{_build}" != "%{_host}"
+%global cross_compile 1
+%endif
+
+%setup -q -n %{python_dir}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 
 %build
+%if %{?cross_compile}
+
+# Create copy of folder
+cd %{_builddir}
+rm -rf %{python_dir}-host
+mkdir -p %{python_dir}-host
+cp -r %{python_dir}/* %{python_dir}-host/
+
+# Build and install Python and Parser
+cd %{python_dir}-host
+./configure --prefix=%{python_hostdir}
+make python Parser/pgen
+make install
+cd %{_builddir}/%{python_dir}
+
+%endif
+
 export OPT="${CFLAGS}"
+
+export CC="%{_host}-gcc"
+export CXX="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
+
+CONFIGURE_OPTS="\
+     --enable-shared \
+     --with-system-expat \
+     --with-system-ffi \
+     --with-dbmliborder=gdbm:ndbm \
+%ifarch arm
+     --disable-ipv6 \
+     ac_cv_file__dev_ptmx=no \
+     ac_cv_file__dev_ptc=no \
+     ac_cv_have_long_long_format=yes \
+%endif
+"
+
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
-    --enable-shared \
-    --with-system-expat \
-    --with-system-ffi \
-    --with-dbmliborder=gdbm:ndbm
-make %{?_smp_mflags}
+    $CONFIGURE_OPTS
+
+make \
+%if %{?cross_compile}
+    PYTHON_FOR_BUILD=%{_builddir}/%{python_dir}-host/python \
+    BLDSHARED="%{_host}-gcc -shared" \
+    CROSS-COMPILE=%{_host}- \
+    CROSS_COMPILE_TARGET=%{_host} \
+    HOSTARCH=%{_host} \
+    BUILDARCH=%{_host} \
+%endif
+    %{?_smp_mflags}
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
