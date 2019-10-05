@@ -130,35 +130,60 @@ Requires: python3 = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%global python_dir Python-%{version}
-%global python_hostdir  %{_builddir}/PythonHost
+%define make_target make
+%define cross_compile 0
+
+%define python_dir Python-%{version}
+%define python_host_install_dir %{_builddir}/PythonHost
+%define python_host_name python_%{_build}
+%define python_host %{python_host_install_dir}/%{_bindir}/python3
 
 # Check if cross-compiling
 %if "%{_build}" != "%{_host}"
 %global cross_compile 1
+%define __strip /usr/bin/%{_host}-strip
+%define __objdump /usr/bin/%{_host}-objdump
 %endif
 
+%if "%{?use_existing}" != ""
+%setup -q -D -T -n %{python_dir}
+%else
 %setup -q -n %{python_dir}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%endif
+
+if [ -f /target-%{_arch}/usr/include/uuid/uuid.h ]; then
+    echo "Found /target-%{_arch}/usr/include/uuid/uuid.h"
+else
+    cp -rv /usr/include/uuid/ /target-%{_arch}/usr/include/
+fi
 
 %build
 %if %{?cross_compile}
 
-# Create copy of folder
-cd %{_builddir}
-rm -rf %{python_dir}-host
-mkdir -p %{python_dir}-host
-cp -r %{python_dir}/* %{python_dir}-host/
+%define make_target make _PYTHON_HOST_PLATFORM=linux-%{_arch}
 
-# Build and install Python and Parser
-cd %{python_dir}-host
-./configure --prefix=%{python_hostdir}
-make python Parser/pgen
-make install
-cd %{_builddir}/%{python_dir}
+if [ -f %{python_host_name} ]; then
+    echo "%{python_host_name} exists..."
+else
+    echo "%{python_host_name} does not exist, building..."
+
+    rm -rf %{python_host_install_dir}
+
+    # Build and install native Python
+    ./configure --prefix=%{_prefix}
+    make python
+    make DESTDIR=%{python_host_install_dir} install
+
+    # Rename host python and pgen
+    mv python %{python_host_name} -v
+
+    # Clean up files
+    make distclean
+fi
 
 %endif
 
@@ -188,22 +213,25 @@ CONFIGURE_OPTS="\
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
+%if %{?cross_compile}
+    _PYTHON_HOST_PLATFORM=linux-%{_arch} \
+    PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '%{python_host} \
+%endif
     $CONFIGURE_OPTS
 
-make \
-%if %{?cross_compile}
-    PYTHON_FOR_BUILD=%{_builddir}/%{python_dir}-host/python \
-    BLDSHARED="%{_host}-gcc -shared" \
-    CROSS-COMPILE=%{_host}- \
-    CROSS_COMPILE_TARGET=%{_host} \
-    HOSTARCH=%{_host} \
-    BUILDARCH=%{_host} \
-%endif
-    %{?_smp_mflags}
+%{make_target} %{?_smp_mflags}
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%{make_target} DESTDIR=%{buildroot} install
+
+# TODO: Figure out the correct way of getting pip
+%if %{cross_compile}
+cp -rv %{python_host_install_dir}/%{_libdir}/python3.7/site-packages/* %{buildroot}/%{_libdir}/python3.7/site-packages
+cp -rv %{python_host_install_dir}/%{_bindir}/pip* %{buildroot}/%{_bindir}
+cp -rv %{python_host_install_dir}/%{_bindir}/easy_install* %{buildroot}/%{_bindir}
+%endif
+
 chmod -v 755 %{buildroot}%{_libdir}/libpython3.7m.so.1.0
 %{_fixperms} %{buildroot}/*
 ln -sf libpython3.7m.so %{buildroot}%{_libdir}/libpython3.7.so
@@ -215,7 +243,7 @@ find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 
 %check
-make  %{?_smp_mflags} test
+%{make_target} %{?_smp_mflags} test
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
