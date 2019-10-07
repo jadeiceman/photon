@@ -39,6 +39,12 @@ Group: Development/Libraries
 %description libs
 These are library files of util-linux.
 
+%if "%{_build}" != "%{_host}"
+%define cross_compile 1
+%define __strip /usr/bin/%{_host}-strip
+%define __objdump /usr/bin/%{_host}-objdump
+%endif
+
 %prep
 %setup -q
 sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' $(grep -rl '/etc/adjtime' .)
@@ -51,9 +57,6 @@ CONFIGURE_OPTS="\
     --disable-static \
     --disable-use-tty-group \
     --without-python \
-    --bindir=/bin \
-    --libdir=/lib \
-    --sbindir=/sbin \
 %ifarch arm
     LDFLAGS=-L/target-%{_arch}/usr/lib \
 %endif
@@ -78,10 +81,12 @@ rm -rf %{buildroot}/lib/systemd/system
 %files
 %defattr(-,root,root)
 %dir %{_sharedstatedir}/hwclock
-/bin/*
-/lib/libfdisk.so.*
-/lib/libsmartcols.so.*
-/sbin/*
+#/bin/*
+#/lib/libfdisk.so.*
+#/lib/libsmartcols.so.*
+#/sbin/*
+%{_libdir}/libfdisk.so.*
+%{_libdir}/libsmartcols.so.*
 %{_bindir}/*
 %{_sbindir}/*
 %{_mandir}/man1/*
@@ -92,9 +97,12 @@ rm -rf %{buildroot}/lib/systemd/system
 
 %files libs
 %defattr(-,root,root)
-/lib/libblkid.so.*
-/lib/libmount.so.*
-/lib/libuuid.so.*
+#/lib/libblkid.so.*
+#/lib/libmount.so.*
+#/lib/libuuid.so.*
+%{_libdir}/libblkid.so.*
+%{_libdir}/libmount.so.*
+%{_libdir}/libuuid.so.*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)

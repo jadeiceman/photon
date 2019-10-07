@@ -10,7 +10,7 @@ Distribution:   Photon
 Source0:        http://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
 %define sha1    e2fsprogs=bfe11b75fee61c4d3795ac27eea11f9f7843294b
 Requires:       %{name}-libs = %{version}-%{release}
-BuildRequires:  util-linux
+BuildRequires:  util-linux-devel
 Conflicts:      toybox
 
 %description

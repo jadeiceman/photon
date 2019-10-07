@@ -99,13 +99,13 @@ function check-for-configure()
     exit 1
   fi
 
-  for param in prefix exec-prefix bindir sbindir libdir includedir sysconfdir datadir libexecdir sharedstatedir mandir infodir localstatedir; do
-    grep -e "\(configure\|^\)[ \t]\+--$param=%{_$param}" $1
-    if [ $? -eq 0 ] ; then
-      echo "ERROR in $1: --$param can be ommited when using %configure"
-      exit 1
-    fi
-  done
+#  for param in prefix exec-prefix bindir sbindir libdir includedir sysconfdir datadir libexecdir sharedstatedir mandir infodir localstatedir; do
+#    grep -e "\(configure\|^\)[ \t]\+--$param=%{_$param}" $1
+#    if [ $? -eq 0 ] ; then
+#      echo "ERROR in $1: --$param can be ommited when using %configure"
+#      exit 1
+#    fi
+#  done
 }
 
 # All BuildRequires should on the top
