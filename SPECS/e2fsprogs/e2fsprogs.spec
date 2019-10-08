@@ -24,6 +24,7 @@ It contains the libraries: libss and libcom_err
 %package    devel
 Summary:    Header and development files for e2fsprogs
 Requires:   %{name} = %{version}
+Requires:   util-linux-devel
 %description    devel
 It contains the libraries and header files to create applications
 

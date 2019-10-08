@@ -31,8 +31,15 @@ These are the header files of libssh2.
 %patch0 -p1
 
 %build
-%configure --disable-static \
-    --enable-shared
+CONFIGURE_OPTS="\
+     --disable-static \
+     --enable-shared \
+%ifarch arm
+     --with-libssl-prefix=/target-%{_arch}/%{_libdir} \
+%endif
+"
+
+%configure $CONFIGURE_OPTS
 make
 
 %install

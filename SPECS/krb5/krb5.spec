@@ -37,16 +37,19 @@ These are the additional language files of krb5.
 %setup -q
 
 %build
+%if "%{_build}" != "%{_host}"
+# Bypass configure errors
+export krb5_cv_attr_constructor_destructor=yes,yes
+export ac_cv_func_regcomp=yes
+export ac_cv_printf_positional=yes
+%endif
+
 cd src &&
 sed -e 's@\^u}@^u cols 300}@' \
     -i tests/dejagnu/config/default.exp &&
 CPPFLAGS="-D_GNU_SOURCE" \
 autoconf &&
 %configure \
-    --prefix=%{_prefix} \
-    --bindir=%{_bindir} \
-    --libdir=%{_libdir} \
-    --sysconfdir=/etc \
         --localstatedir=/var/lib \
         --with-system-et         \
         --with-system-ss         \
