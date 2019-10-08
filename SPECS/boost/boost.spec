@@ -1,4 +1,4 @@
-Summary:	Boost 
+Summary:	Boost
 Name:		boost
 Version:	1.66.0
 Release:	1%{?dist}
@@ -12,7 +12,7 @@ Source0:	http://downloads.sourceforge.net/boost/boost_1_66_0.tar.bz2
 BuildRequires:	bzip2-devel
 
 %description
-Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for 
+Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
 linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions and unit testing.
 
 %package        devel
@@ -37,6 +37,9 @@ The boost-static package contains boost static libraries.
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
+%ifarch arm
+sed -i 's/using gcc ;/using gcc : %{_arch} : %{_host}-g++ ;/g' project-config.jam
+%endif
 ./b2 %{?_smp_mflags} stage threading=multi
 
 %install
