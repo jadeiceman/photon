@@ -17,6 +17,7 @@ Patch4:         CVE-2019-9636.patch
 Patch5:         CVE-2019-9948.patch
 Patch6:         CVE-2019-9740.patch
 Patch7:         CVE-2019-10160.patch
+Patch8:         cross_compile_fix.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -112,8 +113,29 @@ Requires: python2 = %{version}-%{release}
 %description test
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
+%define make_target make
+%define cross_compile 0
+
+%define python_dir Python-%{version}
+%define python_host_install_dir %{_builddir}/PythonHost
+%define python_host_name python_%{_build}
+%define python_host %{python_host_install_dir}/%{_bindir}/python2
+
+# Check if cross-compiling
+%if "%{_build}" != "%{_host}"
+%global cross_compile 1
+%define __strip /usr/bin/%{_host}-strip
+%define __objdump /usr/bin/%{_host}-objdump
+%endif
+
 %prep
-%setup -q -n Python-%{version}
+
+# If use existing is set, then don't delete the existing build folder.
+# Saves time when debugging spec file.
+%if "%{?use_existing}" != ""
+%setup -q -D -T -n %{python_dir}
+%else
+%setup -q -n %{python_dir}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -122,20 +144,81 @@ The test package contains all regression tests for Python as well as the modules
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%if %{?cross_compile}
+%patch8 -p1 -R
+%endif
+%endif
 
 %build
+%if %{?cross_compile}
+
+%define make_target make _PYTHON_HOST_PLATFORM=linux-%{_arch}
+
+if [ -f %{python_host} ]; then
+    echo "%{python_host} exists..."
+else
+    echo "%{python_host} does not exist, building..."
+
+    rm -rf %{python_host_install_dir}
+
+    # Build and install native Python
+    ./configure --prefix=%{_prefix}
+    make python
+    make DESTDIR=%{python_host_install_dir} install
+
+    # Rename host python and pgen
+    mv python %{python_host_name} -v
+
+    # Clean up files
+    make distclean
+fi
+
+%endif
+
+# Fix cross-compiling issue
+sed -i 's:if os.path.normpath(sys.prefix) != \x27/usr\x27 \\:if os.path.normpath(sys.prefix) != \x27/usr\x27 and not cross_compiling \\:g' %{_builddir}/%{python_dir}/setup.py
+
 export OPT="${CFLAGS}"
-%configure \
+
+export CC="%{_host}-gcc"
+export CXX="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
+
+CONFIGURE_OPTS="\
     --enable-shared \
     --with-ssl \
     --with-system-expat \
     --with-system-ffi \
     --enable-unicode=ucs4 \
     --with-dbmliborder=gdbm:ndbm
-make %{?_smp_mflags}
+%ifarch arm
+    --disable-ipv6 \
+    ac_cv_file__dev_ptmx=no \
+    ac_cv_file__dev_ptc=no \
+    ac_cv_have_long_long_format=yes \
+%endif
+"
+
+%if "%{?skip_configure}" == ""
+%configure \
+    CFLAGS="%{optflags}" \
+    CXXFLAGS="%{optflags}" \
+%if %{?cross_compile}
+    _PYTHON_HOST_PLATFORM=linux-%{_arch} \
+    PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/$(PLATDIR) '%{python_host} \
+%endif
+    $CONFIGURE_OPTS
+%endif
+
+%{make_target} %{?_smp_mflags}
+
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%{make_target} DESTDIR=%{buildroot} install
 chmod -v 755 %{buildroot}%{_libdir}/libpython2.7.so.1.0
 %{_fixperms} %{buildroot}/*
 
@@ -157,7 +240,7 @@ find %{buildroot}%{_libdir} -name '*.pyo' -delete
 rm -rf %{buildroot}/*
 
 %check
-make test
+%{make_target} test
 
 %files
 %defattr(-, root, root)

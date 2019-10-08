@@ -1,0 +1,30 @@
+diff -ruN Python-2.7.15/Makefile.pre.in Python-2.7.15_patch/Makefile.pre.in
+--- Python-2.7.15/Makefile.pre.in	2019-10-08 01:26:13.378501812 +0000
++++ Python-2.7.15_patch/Makefile.pre.in	2019-10-08 01:26:56.502503222 +0000
+@@ -1131,12 +1131,12 @@
+ 		$(INSTALL_DATA) $(srcdir)/Modules/xxmodule.c \
+ 			$(DESTDIR)$(LIBDEST)/distutils/tests ; \
+ 	fi
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
++	PYTHONPATH=$(DESTDIR)$(LIBDEST)  $(RUNSHARED) \
+ 		$(PYTHON_FOR_BUILD) -Wi -tt $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST) -f \
+ 		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+ 		$(DESTDIR)$(LIBDEST)
+-	-PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
++	PYTHONPATH=$(DESTDIR)$(LIBDEST) $(RUNSHARED) \
+ 		$(PYTHON_FOR_BUILD) -Wi -tt -O $(DESTDIR)$(LIBDEST)/compileall.py \
+ 		-d $(LIBDEST) -f \
+ 		-x 'bad_coding|badsyntax|site-packages|lib2to3/tests/data' \
+diff -ruN Python-2.7.15/setup.py Python-2.7.15_patch/setup.py
+--- Python-2.7.15/setup.py	2019-10-08 01:25:23.710501481 +0000
++++ Python-2.7.15_patch/setup.py	2019-10-08 01:26:56.502503222 +0000
+@@ -496,7 +496,7 @@
+                     for directory in reversed(options.dirs):
+                         add_dir_to_list(dir_list, directory)
+ 
+-        if os.path.normpath(sys.prefix) != '/usr' and not cross_compiling \
++        if os.path.normpath(sys.prefix) != '/usr' \
+                 and not sysconfig.get_config_var('PYTHONFRAMEWORK'):
+             # OSX note: Don't add LIBDIR and INCLUDEDIR to building a framework
+             # (PYTHONFRAMEWORK is set) to avoid # linking problems when
