@@ -29,7 +29,8 @@ Provides header files needed for Cifs-Utils development.
 %setup -q 
 
 %build
-autoreconf -fiv &&%configure --prefix=%{_prefix}
+autoreconf -fiv && \
+%configure
 make
 
 %install

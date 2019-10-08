@@ -29,7 +29,7 @@ make DESTDIR=%{buildroot} install
 rm -rf %{buildroot}%{_infodir}
 
 %check
-sed -i "s:%configure:LEXLIB=/usr/lib/libfl.a &:" t/lex-{clean,depend}-cxx.sh
+sed -i "s:./configure:LEXLIB=/usr/lib/libfl.a &:" t/lex-{clean,depend}-cxx.sh
 sed -i "s|test ! -s stderr||g" t/distcheck-no-prefix-or-srcdir-override.sh
 make %{?_smp_mflags} check
 

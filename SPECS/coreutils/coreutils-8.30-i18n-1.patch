@@ -430,9 +430,9 @@ diff -Naurp coreutils-8.30-orig/bootstrap.conf.orig coreutils-8.30/bootstrap.con
 +    done
 +  fi
 +}
-diff -Naurp coreutils-8.30-ori%configure.ac coreutils-8.3%configure.ac
---- coreutils-8.30-ori%configure.ac	2018-05-13 21:20:24.000000000 -0700
-+++ coreutils-8.3%configure.ac	2018-09-07 16:11:47.876496980 -0700
+diff -Naurp coreutils-8.30-orig/configure.ac coreutils-8.30/configure.ac
+--- coreutils-8.30-orig/configure.ac	2018-05-13 21:20:24.000000000 -0700
++++ coreutils-8.30/configure.ac	2018-09-07 16:11:47.876496980 -0700
 @@ -436,6 +436,8 @@ fi
  # I'm leaving it here for now.  This whole thing needs to be modernized...
  gl_WINSIZE_IN_PTEM
@@ -442,9 +442,9 @@ diff -Naurp coreutils-8.30-ori%configure.ac coreutils-8.3%configure.ac
  gl_HEADER_TIOCGWINSZ_IN_TERMIOS_H
  
  if test $gl_cv_sys_tiocgwinsz_needs_termios_h = no && \
-diff -Naurp coreutils-8.30-ori%configure.ac.orig coreutils-8.3%configure.ac.orig
---- coreutils-8.30-ori%configure.ac.orig	1969-12-31 16:00:00.000000000 -0800
-+++ coreutils-8.3%configure.ac.orig	2018-05-13 21:20:24.000000000 -0700
+diff -Naurp coreutils-8.30-orig/configure.ac.orig coreutils-8.30/configure.ac.orig
+--- coreutils-8.30-orig/configure.ac.orig	1969-12-31 16:00:00.000000000 -0800
++++ coreutils-8.30/configure.ac.orig	2018-05-13 21:20:24.000000000 -0700
 @@ -0,0 +1,637 @@
 +# -*- autoconf -*-
 +# Process this file with autoconf to produce a configure script.
@@ -488,10 +488,10 @@ diff -Naurp coreutils-8.30-ori%configure.ac.orig coreutils-8.3%configure.ac.orig
 +AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
 +
 +dnl POSIXCHECK is worthwhile for maintainers, but adds several seconds
-+dnl (more than 10% execution time) to %configure, with no benefit for
++dnl (more than 10% execution time) to ./configure, with no benefit for
 +dnl most users.  Using it to look for bugs requires:
 +dnl   GNULIB_POSIXCHECK=1 autoreconf -f
-+dnl   %configure
++dnl   ./configure
 +dnl   make
 +dnl   make -C src clean
 +dnl   make CFLAGS=-DGNULIB_POSIXCHECK=1
