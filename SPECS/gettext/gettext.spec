@@ -15,18 +15,32 @@ These allow programs to be compiled with NLS
 (Native Language Support), enabling them to output
 messages in the user's native language.
 
+%if "%{_build}" != "%{_host}"
+%define __strip %{_host}-strip
+%define __objdump %{_host}-objdump
+%endif
+
 %prep
 %setup -q
 
 %build
-%configure \
-	--prefix=%{_prefix} \
-	--docdir=%{_defaultdocdir}/%{name}-%{version} \
-	--disable-silent-rules
+CONFIGURE_OPTS="\
+        --docdir=%{_defaultdocdir}/%{name}-%{version} \
+        --disable-silent-rules \
+%ifarch arm
+        --with-libncurses-prefix=/target-%{_arch}/usr \
+%endif
+"
+%configure $CONFIGURE_OPTS
 make %{?_smp_mflags}
 
 %install
+%ifarch arm
+# Cross build errors on re-linking .la, so ignore it since .la files are deleted later anyway
+make -i DESTDIR=%{buildroot} install
+%else
 make DESTDIR=%{buildroot} install
+%endif
 find %{buildroot}%{_libdir} -name '*.la' -delete
 rm -rf %{buildroot}/usr/share/doc/gettext-%{version}/examples
 rm -rf %{buildroot}%{_infodir}
