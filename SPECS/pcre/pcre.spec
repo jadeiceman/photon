@@ -9,6 +9,7 @@ Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/%{name}-%{version}.tar.bz2
 %define sha1    pcre=df0d1c2ff04c359220cb902539a6e134af4497f4
+Patch0:         libtool_fix.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
 Requires:       libgcc
@@ -33,11 +34,15 @@ Group:      System Environment/Libraries
 %description libs
 This package contains minimal set of shared pcre libraries.
 
+%if "%{_build}" != "%{_host}"
+%define __strip %{_host}-strip
+%define __objdump %{_host}-objdump
+%endif
+
 %prep
 %setup -q
 %build
-%configure --prefix=/usr                     \
-            --docdir=/usr/share/doc/pcre-%{version} \
+%configure --docdir=/usr/share/doc/pcre-%{version} \
             --enable-unicode-properties       \
             --enable-pcre16                   \
             --enable-pcre32                   \
@@ -47,6 +52,11 @@ This package contains minimal set of shared pcre libraries.
             --with-match-limit-recursion=16000 \
             --disable-static
 make %{?_smp_mflags}
+
+%ifarch arm
+# Patch libtool to fix relinking issue
+patch libtool < %{_sourcedir}/libtool_fix.patch
+%endif
 
 %install
 make DESTDIR=%{buildroot} install
