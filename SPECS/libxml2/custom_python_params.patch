@@ -1,0 +1,46 @@
+--- mybuild/libxml2-2.9.8/configure.ac_orig	2018-03-05 15:54:00.000000000 +0000
++++ libxml2-2.9.8/configure.ac	2019-10-09 23:02:21.069602838 +0000
+@@ -806,10 +806,12 @@
+ dnl check for python
+ dnl
+ 
++PYTHON_CROSS_PREFIX=${PYTHON_CROSS_PREFIX}
+ PYTHON_VERSION=
+-PYTHON_INCLUDES=
++PYTHON_INCLUDES=${PYTHON_INCLUDES}
+ PYTHON_SITE_PACKAGES=
+ PYTHON_TESTS=
++PYTHON_LIBS=${PYTHON_LIBS}
+ pythondir=
+ if test "$with_python" != "no" ; then
+     if test -x "$with_python/bin/python"
+@@ -840,7 +842,10 @@
+     if test "$PYTHON" != ""
+     then
+         PYTHON_VERSION=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_version())"`
+-	PYTHON_INCLUDES=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"`
++        if test "$PYTHON_INCLUDES" == ""
++        then
++	    PYTHON_INCLUDES=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"`
++        fi
+ # does not work as it produce a /usr/lib/python path instead of/usr/lib64/python
+ #
+ #	PYTHON_SITE_PACKAGES=`$PYTHON -c "from distutils import sysconfig; print(sysconfig.get_python_lib())"`
+@@ -889,7 +894,16 @@
+ 	fi
+     fi
+     pythondir='$(PYTHON_SITE_PACKAGES)'
+-    PYTHON_LIBS=`python$PYTHON_VERSION-config --ldflags`
++    if test "$PYTHON_LIBS" == ""
++    then
++        PYTHON_LIBS=`python$PYTHON_VERSION-config --ldflags`
++    fi
++
++    if test "$PYTHON_CROSS_PREFIX" != ""
++    then
++        PYTHON_INCLUDES="$PYTHON_CROSS_PREFIX$PYTHON_INCLUDES"
++        PYTHON_LIBS=`$PYTHON_CROSS_PREFIX/usr/bin/python$PYTHON_VERSION-config --ldflags`
++    fi
+ else
+     PYTHON=
+ fi

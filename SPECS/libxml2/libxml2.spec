@@ -1,6 +1,17 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 
+%{!?python2_inc: %define python2_inc %(python2 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
+%{!?python3_inc: %define python3_inc %(python3 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
+
+%if "%{_build}" != "%{_host}"
+%define __strip %{_host}-strip
+%define __objdump %{_host}-objdump
+%define cross_compile 1
+%else
+%define cross_compile 0
+%endif
+
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.9.8
@@ -12,6 +23,7 @@ Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
 Patch0:         Fix_nullptr_deref_with_XPath_logic_ops.patch
+Patch1:         custom_python_params.patch
 %define sha1    libxml2=66bcefd98a6b7573427cf66f9d3841b59eb5b8c3
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
@@ -50,12 +62,23 @@ Static libraries and header files for the support library for libxml
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
+# Rebuild configure so that PYTHON_INCLUDES can be defined externally
+autoreconf configure.ac
+%ifarch arm
+export PYTHON_CROSS_PREFIX=/target-%{_arch}
+%endif
+
 %configure \
     --disable-static \
     --with-history
+
 make %{?_smp_mflags}
+
+# Patch libtool
+patch libtool < %{_sourcedir}/libtool-2.4.6-fixinstall_trailingslash.patch
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
@@ -64,10 +87,18 @@ find %{buildroot}/%{_libdir} -name '*.la' -delete
 %{_fixperms} %{buildroot}/*
 
 make clean
+
+%ifarch arm
+export PYTHON_CROSS_PREFIX=/target-%{_arch}
+%endif
+
 %configure \
     --disable-static \
     --with-python=/usr/bin/python3
 make %{?_smp_mflags}
+
+# Patch again
+patch libtool < %{_sourcedir}/libtool-2.4.6-fixinstall_trailingslash.patch
 make install DESTDIR=%{buildroot}
 
 %check
@@ -86,7 +117,6 @@ rm -rf %{buildroot}/*
 %{_datadir}/aclocal/*
 %{_datadir}/gtk-doc/*
 %{_mandir}/man1/*
-
 
 %files python
 %defattr(-,root,root)

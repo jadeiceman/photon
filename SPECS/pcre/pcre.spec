@@ -69,7 +69,7 @@ make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
-%files 
+%files
 %defattr(-,root,root)
 %{_bindir}/pcregrep
 %{_bindir}/pcretest
