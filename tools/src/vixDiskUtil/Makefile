@@ -7,4 +7,4 @@ clean:
 	$(RM) ../../bin/vixdiskutil
 
 vix-disklib-util: vixDiskUtil.cpp
-	$(CXX) -o ../../bin/vixdiskutil -I$(INCLUDEDIR) -L$(LIBDIR) $? -ldl -lvixDiskLib -lvixMntapi -lvixDiskLibVim -lpthread -lssl -lfuse
+	$(CXX) -o ../../bin/vixdiskutil -I$(INCLUDEDIR) -L$(LIBDIR) $? -ldl -lvixDiskLib -lvixMntapi -lvixDiskLibVim -lpthread -lssl -lfuse -D_GLIBCXX_USE_CXX11_ABI=0
