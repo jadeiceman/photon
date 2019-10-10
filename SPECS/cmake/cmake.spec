@@ -32,12 +32,58 @@ Requires:       bzip2
 %description
 CMake is an extensible, open-source system that manages the build process in an
 operating system and in a compiler-independent manner.
+
+%define cmake_host_install_dir %{_builddir}/CMakeHost
+%define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
+
+%if "%{_build}" != "%{_host}"
+%define __strip %{_host}-strip
+%define __objdump %{_host}-objdump
+%define cross_compile 1
+%endif
+
 %prep
 %setup -q
 %patch0 -p1
 %build
-ncores="$(/usr/bin/getconf _NPROCESSORS_ONLN)"
-./bootstrap --prefix=%{_prefix} --system-expat --system-zlib --system-libarchive --system-bzip2 --parallel=$ncores
+if [-d %{cmake_host_install_dir} ]
+then
+# Bootstrap and make CMake for host
+%if %{?cross_compile}
+    ncores="$(/usr/bin/getconf _NPROCESSORS_ONLN)"
+    ./bootstrap --prefix=%{_prefix} --system-expat --system-zlib --system-libarchive --system-bzip2 --parallel=$ncores
+    make %{?_smp_mflags}
+    make DESTDIR=%{cmake_host_install_dir} install
+%endif
+fi
+
+# Create toolchain file for cross compile
+rm %{cmake_toolchain_file}
+cat << EOF >> %{cmake_toolchain_file}
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR %{_arch})
+
+set(CMAKE_SYSROOT /target-%{_arch})
+
+set(CMAKE_C_COMPILER %{_bindir}/%{_host}-gcc)
+set(CMAKE_CXX_COMPILER %{_bindir}/%{_host}-g++)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+EOF
+
+# Configure CMake
+CMAKE_OPTS="\
+    -D CMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
+    -D CMAKE_INSTALL_PREFIX=%{_prefix} \
+    -D HAVE_POSIX_STRERROR_R=1 \
+    --debug-trycompile \
+"
+%{cmake_host_install_dir}/%{_bindir}/cmake $CMAKE_OPTS . || \
+%{cmake_host_install_dir}/%{_bindir}/cmake $CMAKE_OPTS .
+
 make %{?_smp_mflags}
 
 %install
