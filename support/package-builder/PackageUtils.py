@@ -280,6 +280,7 @@ class PackageUtils(object):
             buildTuple = '%s-unknown-linux-gnu' % constants.buildArch
             targetMacroPath = '%s/macros/macros_%s' % (constants.topDirPath, constants.targetArch)
             localTargetMacroPath = sandbox.getID() + targetMacroPath
+            macroPath = '/etc/rpm/macros.%s' % constants.targetArch
 
             rpmBuildcmd += ' --define \"_build %\"' % buildTuple
             rpmBuildcmd += ' --define \"_host %s\"' % hostTuple
@@ -288,7 +289,8 @@ class PackageUtils(object):
             self.logger.debug("Searching for macro file: %s" % localTargetMacroPath)
             if os.path.isfile(localTargetMacroPath):
                 self.logger.debug("Using macro file: %s..." % targetMacroPath)
-                rpmBuildcmd += ' \'--macros=<%s>\'' % targetMacroPath
+                shutil.copyfile(localTargetMacroPath, sandbox.getID() + macroPath)
+                # rpmBuildcmd += ' \'--macros=<%s>\'' % targetMacroPath
             else:
                 rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
                 rpmBuildcmd += ' --define \"_datarootdir /usr/share\"'

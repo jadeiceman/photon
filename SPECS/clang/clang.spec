@@ -37,10 +37,63 @@ for developing applications that use clang.
 %setup -q -n cfe-%{version}.src
 
 %build
+%if "%{?cross_compile}" != ""
+
+%define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
+%define host_install_dir %{_builddir}/ClangHost
+
+# Configure and build host Clang for cross compiling
+if [ -d %{host_install_dir} ]
+then
+    echo "%{host_install_dir} already exists..."
+else
+    echo "Building host %{name}..."
+    mkdir -p build_host
+    cd build_host
+
+    cmake -DCMAKE_INSTALL_PREFIX=/usr           \
+          -DCMAKE_BUILD_TYPE=Release            \
+          -Wno-dev ..
+
+    make %{?_smp_mflags}
+    make DESTDIR=%{host_install_dir} install
+    cd ..
+fi
+
+# Create toolchain file for cross compile
+rm -f %{cmake_toolchain_file}
+cat << EOF >> %{cmake_toolchain_file}
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR %{_arch})
+
+set(CMAKE_SYSROOT /target-%{_arch})
+
+set(CMAKE_C_COMPILER %{_bindir}/%{_host}-gcc)
+set(CMAKE_CXX_COMPILER %{_bindir}/%{_host}-g++)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+EOF
+
+%endif
+
+%ifarch arm
+#sed -i 's=include_directories("${LLVM_BINARY_DIR}/include" "${LLVM_MAIN_INCLUDE_DIR}")=include_directories("/target-%{_arch}/${LLVM_BINARY_DIR}/include" "/target-%{_arch}/${LLVM_MAIN_INCLUDE_DIR}")=g' CMakeLists.txt
+
+#sed -i 's=link_directories("${LLVM_LIBRARY_DIR}")=link_directories("/target-arm/${LLVM_LIBRARY_DIR}")=g' CMakeLists.txt
+%endif
+
 mkdir -p build
 cd build
+
 cmake -DCMAKE_INSTALL_PREFIX=/usr   \
       -DCMAKE_BUILD_TYPE=Release    \
+%ifarch arm
+      -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
+      -DCLANG_TABLEGEN=%{host_install_dir}/usr/bin/clang-tblgen \
+%endif
       -Wno-dev ..
 
 make %{?_smp_mflags}
