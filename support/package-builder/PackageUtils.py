@@ -276,12 +276,25 @@ class PackageUtils(object):
             rpmBuildcmd += ' --define \"%s\"' % macro
 
         if constants.crossCompiling:
-            rpmBuildcmd += ' --define \"_build %s-unknown-linux-gnu\"' % constants.buildArch
-            rpmBuildcmd += ' --define \"_host %s-unknown-%s\"' % (constants.targetArch, constants.targetArchSuffix)
-            rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
-            #rpmBuildcmd += ' --define \"_prefix /usr\"'
-            rpmBuildcmd += ' --define \"_datarootdir /usr/share\"'
-            rpmBuildcmd += ' --target='+constants.targetArch+'-unknown-'+constants.targetArchSuffix
+            hostTuple = '%s-unknown-%s' % (constants.targetArch, constants.targetArchSuffix)
+            buildTuple = '%s-unknown-linux-gnu' % constants.buildArch
+            targetMacroPath = '%s/macros/macros_%s' % (constants.topDirPath, constants.targetArch)
+            localTargetMacroPath = sandbox.getID() + targetMacroPath
+
+            rpmBuildcmd += ' --define \"_build %\"' % buildTuple
+            rpmBuildcmd += ' --define \"_host %s\"' % hostTuple
+            rpmBuildcmd += ' --define \"cross_compile 1\"'
+            
+            self.logger.debug("Searching for macro file: %s" % localTargetMacroPath)
+            if os.path.isfile(localTargetMacroPath):
+                self.logger.debug("Using macro file: %s..." % targetMacroPath)
+                rpmBuildcmd += ' \'--macros=<%s>\'' % targetMacroPath
+            else:
+                rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
+                rpmBuildcmd += ' --define \"_datarootdir /usr/share\"'
+                rpmBuildcmd += ' --define \"__strip %s-strip\"' % hostTuple
+                rpmBuildcmd += ' --define \"__objdump %s-objdump\"' % hostTuple
+            rpmBuildcmd += ' --target=' + constants.targetArch + '-unknown-' + constants.targetArchSuffix
             
         rpmBuildcmd += " " + specFile
 
@@ -289,8 +302,6 @@ class PackageUtils(object):
         self.logger.debug(rpmBuildcmd)
         
         sandbox.run("uname -a", logfile = logFile, logfn = self.logger.debug)
-        #sandbox.run("rpm --eval '%{_arch}' ", logfile = logFile, logfn = self.logger.debug)
-        #sandbox.run("rpm --eval '%{_datarootdir}' ", logfile = logFile, logfn = self.logger.debug)
 
         returnVal = sandbox.run(rpmBuildcmd, logfile = logFile)
 

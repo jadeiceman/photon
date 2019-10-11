@@ -1,0 +1,72 @@
+#
+#   System settings
+#
+%_topdir            /usr/src/photon
+
+%_arch              arm
+%_os                linux
+%_vendor            unknown
+%_gnu               gnueabihf
+%_target_triplet    %{_arch}-%{_vendor}-%{_os}-%{_gnu}
+%_target_root       /target-%{_arch}
+
+#
+#   Build flags
+#
+%optflags          -O2 -g -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16
+
+#
+#   Some standard locations
+#
+%_prefix            /usr
+%_exec_prefix       %{_prefix}
+%_sysconfdir        /etc
+%_lib               %{_prefix}/lib
+%_lib64             %{_prefix}/lib64
+%_bindir            %{_exec_prefix}/bin
+%_sbindir           %{_exec_prefix}/sbin
+%_libdir            %{_prefix}/lib
+%_lib64dir          %{_prefix}/lib64
+%_libexecdir        %{_prefix}/libexec
+%_datadir           %{_prefix}/share
+%_docdir            %{_prefix}/share/doc
+%_includedir        %{_prefix}/include
+%_infodir           %{_prefix}/share/info
+%_mandir            %{_prefix}/share/man
+%_oldincludedir     /usr/include
+%_var               /var
+%_sharedstatedir    %{_var}/lib
+%_localstatedir     %{_var}
+%_datarootdir       %{_prefix}/share
+%_initddir          %{_sysconfdir}/init.d
+
+# Maximum number of CPU's to use when building, 0 for unlimited.
+#%_smp_ncpus_max 0
+%_smp_mflags %([ -z "$RPM_BUILD_NCPUS" ] \\\
+        && RPM_BUILD_NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
+        ncpus_max=%{?_smp_ncpus_max}; \\\
+        if [ -n "$ncpus_max" ] && [ "$ncpus_max" -gt 0 ] && [ "$RPM_BUILD_NCPUS" -gt "$ncpus_max" ]; then RPM_BUILD_NCPUS="$ncpus_max"; fi; \\\
+        if [ "$RPM_BUILD_NCPUS" -gt 1 ]; then echo "-j$RPM_BUILD_NCPUS"; fi)
+
+%__tar              /bin/tar --no-same-owner
+
+%__strip %{_target_triplet}-strip
+%__objdump %{_target_triplet}-objdump
+
+%_enable_debug_packages 1
+%_include_minidebuginfo 1
+%_use_internal_dependency_generator 1
+%_build_id_links alldebug
+
+%__os_install_post    \
+    %{_rpmconfigdir}/brp-compress \
+    %{_rpmconfigdir}/brp-strip %{__strip} \
+    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
+    %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
+    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
+%{nil}
+
+%install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
+%%install\
+%{nil}

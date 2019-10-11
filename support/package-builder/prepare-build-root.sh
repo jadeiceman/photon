@@ -27,6 +27,10 @@ if mountpoint ${BUILDROOT}/dev	>/dev/null 2>&1; then umount -R ${BUILDROOT}/dev;
 
 cp /etc/resolv.conf ${BUILDROOT}/etc/
 
+# Copy custom RPM macros
+mkdir -p ${BUILDROOT}/${PARENT}/macros
+cp -r ../macros/* ${BUILDROOT}/${PARENT}/macros/ -v
+
 if [ ${EUID} -eq 0 ] ; then
 # 	Ommited in the filesystem.spec file - not needed for booting
     [ -e ${BUILDROOT}/dev/console ]	|| mknod -m 600 ${BUILDROOT}/dev/console c 5 1
