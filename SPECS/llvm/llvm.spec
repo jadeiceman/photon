@@ -1,6 +1,6 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        6.0.1
+Version:        8.0.1
 Release:        3%{?dist}
 License:        NCSA
 URL:            http://lldb.llvm.org
