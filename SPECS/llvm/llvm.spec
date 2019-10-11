@@ -26,19 +26,79 @@ Requires:       %{name} = %{version}-%{release}
 The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
+%if "%{_build}" != "%{_host}"
+%define cross_compile 1
+%endif
+
 %prep
 %setup -q -n %{name}-%{version}.src
 
 %build
+
+%if "%{?cross_compile}" != ""
+
+%define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
+%define llvm_host_install_dir %{_builddir}/LLVMHost
+
+# Configure and build host LLVM for cross compiling
+if [ -d %{llvm_host_install_dir} ]
+then
+    echo "%{llvm_host_install_dir} already exists..."
+else
+    echo "Building host LLVM..."
+    mkdir -p build_host
+    cd build_host
+
+    cmake -DCMAKE_INSTALL_PREFIX=/usr           \
+          -DLLVM_ENABLE_FFI=ON                  \
+          -DCMAKE_BUILD_TYPE=Release            \
+          -DLLVM_BUILD_LLVM_DYLIB=ON            \
+          -DLLVM_TARGETS_TO_BUILD="host" \
+          -DLLVM_INCLUDE_GO_TESTS=No            \
+          -Wno-dev ..
+
+    make %{?_smp_mflags}
+    make DESTDIR=%{llvm_host_install_dir} install
+    cd ..
+fi
+
+# Create toolchain file for cross compile
+rm -f %{cmake_toolchain_file}
+cat << EOF >> %{cmake_toolchain_file}
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR %{_arch})
+
+set(CMAKE_SYSROOT /target-%{_arch})
+
+set(CMAKE_C_COMPILER %{_bindir}/%{_host}-gcc)
+set(CMAKE_CXX_COMPILER %{_bindir}/%{_host}-g++)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+EOF
+
+%endif
+
 mkdir -p build
 cd build
+
+# Configure and build target LLVM
 cmake -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLVM_ENABLE_FFI=ON                  \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
+%ifarch arm
+      -DLLVM_TARGETS_TO_BUILD="ARM" \
+      -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
+      -DLLVM_TABLEGEN=%{llvm_host_install_dir}/usr/bin/llvm-tblgen \
+%else
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
+%endif
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -Wno-dev ..
+
 
 make %{?_smp_mflags}
 %install
