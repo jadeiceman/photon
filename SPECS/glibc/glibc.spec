@@ -131,7 +131,7 @@ CONFIGURE_OPTS="\
 %endif
 "
 
-%if %{?cross_compile}
+%if "%{?cross_compile}" != ""
 cd %{_builddir}/linux-%{linux_kernel_version} && \
 make mrproper && \
 make ARCH=%{_arch} headers_check && \
@@ -189,7 +189,7 @@ popd
 %find_lang %{name} --all-name
 pushd localedata
 
-%if %{cross_compile} == 0
+%if "%{?cross_compile}" == ""
 # Generate out of locale-archive an (en_US.) UTF-8 locale
 mkdir -p %{buildroot}/usr/lib/locale
 I18NPATH=. GCONV_PATH=%{_builddir}/glibc-build/iconvdata LC_ALL=C %{_builddir}/glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A %{builddir}/%{name}-%{version}/intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
@@ -231,7 +231,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files
 %defattr(-,root,root)
-%if %{cross_compile} == 0
+%if "%{?cross_compile}" == ""
 %{_libdir}/locale/*
 %config(missingok,noreplace) %{_sysconfdir}/ld.so.cache
 %endif
