@@ -1,14 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        8.0.1
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        NCSA
 URL:            http://lldb.llvm.org
 Group:          Development/Tools
 Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        http://releases.llvm.org/%{version}/%{name}-%{version}.src.tar.xz
-%define sha1    llvm=09a6316c5225cab255ba12391e7abe5ff4d28935
+%define sha1    llvm=09964f9eabc364f221a3caefbdaea28557273b4a
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  libffi-devel
@@ -138,6 +138,8 @@ rm -rf %{buildroot}/*
 %{_includedir}/*
 
 %changelog
+*   Fri Oct 11 2019 Jonathan Chiu <jochi@microsoft.com> 8.0.1-1
+-   Update to 8.0.1
 *   Wed Jun 26 2019 Keerthana K <keerthanak@vmware.com> 6.0.1-3
 -   Enable target BPF
 *   Tue Jan 08 2019 Alexey Makhalov <amakhalov@vmware.com> 6.0.1-2
