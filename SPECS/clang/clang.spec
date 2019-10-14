@@ -55,7 +55,7 @@ else
           -DCMAKE_BUILD_TYPE=Release            \
           -Wno-dev ..
 
-    make %{?_smp_mflags} clang
+    make %{?_smp_mflags}
     make DESTDIR=%{host_install_dir} install
     cd ..
 fi
@@ -92,7 +92,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr   \
 %endif
       -Wno-dev ..
 
-make %{?_smp_mflags} clang
+make %{?_smp_mflags}
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
