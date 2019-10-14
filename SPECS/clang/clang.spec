@@ -79,12 +79,6 @@ EOF
 
 %endif
 
-%ifarch arm
-#sed -i 's=include_directories("${LLVM_BINARY_DIR}/include" "${LLVM_MAIN_INCLUDE_DIR}")=include_directories("/target-%{_arch}/${LLVM_BINARY_DIR}/include" "/target-%{_arch}/${LLVM_MAIN_INCLUDE_DIR}")=g' CMakeLists.txt
-
-#sed -i 's=link_directories("${LLVM_LIBRARY_DIR}")=link_directories("/target-arm/${LLVM_LIBRARY_DIR}")=g' CMakeLists.txt
-%endif
-
 mkdir -p build
 cd build
 
@@ -93,6 +87,8 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr   \
 %ifarch arm
       -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
       -DCLANG_TABLEGEN=%{host_install_dir}/usr/bin/clang-tblgen \
+%else
+      -DLLVM_CONFIG=/usr/bin/llvm-config \
 %endif
       -Wno-dev ..
 
