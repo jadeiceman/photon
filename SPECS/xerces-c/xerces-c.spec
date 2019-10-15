@@ -24,7 +24,15 @@ This package contains development headers and static library for xml parser.
 %prep
 %setup -q
 %build
-%configure --prefix=/usr
+%if "%{?cross_compile}" != ""
+# Bypass checks for cross compile
+sed -i '219s/.*/AC_COMPILE_IFELSE(  [AC_LANG_PROGRAM([[#include <wchar.h>]],/' configure.ac
+sed -i '231s/.*/AC_COMPILE_IFELSE(  [AC_LANG_PROGRAM([[#include <wchar.h>/' configure.ac
+sed -i '253s/.*/AC_COMPILE_IFELSE(  [AC_LANG_PROGRAM([[#include <wchar.h>/' configure.ac
+autoreconf configure.ac
+%endif
+
+%configure
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

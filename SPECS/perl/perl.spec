@@ -20,7 +20,7 @@ Distribution:   Photon
 Source0:        http://www.cpan.org/src/5.0/%{name}-%{version}.tar.gz
 %define sha1    perl=0622f86160e8969633cbd21a2cca9e11ae1f8c5a
 Source1:        https://github.com/arsv/perl-cross/releases/download/%{perl_cross_version}/perl-cross-%{perl_cross_version}.tar.gz
-%define sha1    perl=0622f86160e8969633cbd21a2cca9e11ae1f8c5a
+%define sha1    perl-cross=7417d0e7edf88ffea027c02f33cf28b3e4520213
 Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
 Provides:       perl(s)
