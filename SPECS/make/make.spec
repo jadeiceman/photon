@@ -20,7 +20,6 @@ The Make package contains a program for compiling packages.
 sed -i '211,217 d; 219,229 d; 232 d' glob/glob.c
 
 %configure \
-	--prefix=%{_prefix} \
 	--disable-silent-rules
 make %{?_smp_mflags}
 
