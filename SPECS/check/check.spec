@@ -9,15 +9,16 @@ Source0:	https://github.com/libcheck/check/archive/%{name}-%{version}.tar.gz
 Group:		Development/Tools
 Vendor:		VMware, Inc.
 Distribution: Photon
+Requires:   gawk
 %description
-Check is a unit testing framework for C. It features a simple interface for defining unit tests, 
-putting little in the way of the developer. Tests are run in a separate address space, 
+Check is a unit testing framework for C. It features a simple interface for defining unit tests,
+putting little in the way of the developer. Tests are run in a separate address space,
 so both assertion failures and code errors that cause segmentation faults or other signals can be caught.
 %prep
 %setup -q
 %build
 autoreconf --install
-%configure --prefix=%{_prefix}
+%configure
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

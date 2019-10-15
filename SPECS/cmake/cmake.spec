@@ -36,29 +36,28 @@ operating system and in a compiler-independent manner.
 %define cmake_host_install_dir %{_builddir}/CMakeHost
 %define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
 
-%if "%{_build}" != "%{_host}"
-%define __strip %{_host}-strip
-%define __objdump %{_host}-objdump
-%define cross_compile 1
-%endif
-
 %prep
 %setup -q
 %patch0 -p1
 %build
-if [-d %{cmake_host_install_dir} ]
+if [ -d %{cmake_host_install_dir} ]
 then
+    echo "%{cmake_host_install_dir} exists..."
+else
 # Bootstrap and make CMake for host
 %if %{?cross_compile}
     ncores="$(/usr/bin/getconf _NPROCESSORS_ONLN)"
-    ./bootstrap --prefix=%{_prefix} --system-expat --system-zlib --system-libarchive --system-bzip2 --parallel=$ncores
+    mkdir -p build_host
+    cd build_host
+    ../bootstrap --prefix=%{_prefix} --system-expat --system-zlib --system-libarchive --system-bzip2 --parallel=$ncores
     make %{?_smp_mflags}
     make DESTDIR=%{cmake_host_install_dir} install
+    cd ..
 %endif
 fi
 
 # Create toolchain file for cross compile
-rm %{cmake_toolchain_file}
+rm -f %{cmake_toolchain_file}
 cat << EOF >> %{cmake_toolchain_file}
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR %{_arch})

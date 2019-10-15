@@ -138,13 +138,6 @@ The test package contains all regression tests for Python as well as the modules
 %define python_host_name python_%{_build}
 %define python_host %{python_host_install_dir}/%{_bindir}/python3
 
-# Check if cross-compiling
-%if "%{_build}" != "%{_host}"
-%global cross_compile 1
-%define __strip /usr/bin/%{_host}-strip
-%define __objdump /usr/bin/%{_host}-objdump
-%endif
-
 %if "%{?use_existing}" != ""
 %setup -q -D -T -n %{python_dir}
 %else

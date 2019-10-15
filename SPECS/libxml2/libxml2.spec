@@ -24,6 +24,7 @@ Distribution:   Photon
 Source0:        ftp://xmlsoft.org/libxml2/%{name}-%{version}.tar.gz
 Patch0:         Fix_nullptr_deref_with_XPath_logic_ops.patch
 Patch1:         custom_python_params.patch
+Patch2:         libtool-2.4.6-fixinstall_trailingslash.patch
 %define sha1    libxml2=66bcefd98a6b7573427cf66f9d3841b59eb5b8c3
 BuildRequires:  python2-devel
 BuildRequires:  python2-libs
