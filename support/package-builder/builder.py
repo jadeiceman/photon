@@ -57,7 +57,7 @@ def main():
     parser.add_argument("-bt", "--build-type", dest="pkgBuildType", choices=['chroot', 'container'], default="chroot")
     parser.add_argument("-F", "--kat-build", dest="katBuild", default=None)
     parser.add_argument("-ct", "--cross-target", dest="targetArch", choices=['x86_64', 'aarch64', 'arm', 'armv7hl'], default=None)
-    parser.add_argument("-cts", "--cross-target-suffix", dest="targetArchSuffix", default="linux-gnu")
+    parser.add_argument("-ctp", "--cross-tuple", dest="targetArchTuple", default=None)
     parser.add_argument("-pj", "--packages-json-input", dest="pkgJsonInput", default=None)
     parser.add_argument("PackageName", nargs='?')
     options = parser.parse_args()
@@ -125,8 +125,8 @@ def main():
     if options.targetArch:
         constants.targetArch = options.targetArch
         
-    if options.targetArchSuffix:
-        constants.targetArchSuffix = options.targetArchSuffix
+    if options.targetArchTuple:
+        constants.targetArchTuple = options.targetArchTuple
 
     cmdUtils.runCommandInShell("mkdir -p "+options.rpmPath+"/"+constants.buildArch)
     cmdUtils.runCommandInShell("mkdir -p "+options.rpmPath+"/noarch")

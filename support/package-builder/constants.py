@@ -33,7 +33,7 @@ class constants(object):
     listMakeCheckRPMPkgWithVersionstoInstall = None
     buildArch = platform.machine()
     targetArch = platform.machine()
-    targetArchSuffix = "linux-gnu"
+    targetArchTuple = None
     crossCompiling = False
     currentArch = buildArch
 

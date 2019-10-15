@@ -276,14 +276,13 @@ class PackageUtils(object):
             rpmBuildcmd += ' --define \"%s\"' % macro
 
         if constants.crossCompiling:
-            hostTuple = '%s-unknown-%s' % (constants.targetArch, constants.targetArchSuffix)
             buildTuple = '%s-unknown-linux-gnu' % constants.buildArch
             targetMacroPath = '%s/macros/macros_%s' % (constants.topDirPath, constants.targetArch)
             localTargetMacroPath = sandbox.getID() + targetMacroPath
             macroPath = '/etc/rpm/macros.%s' % constants.targetArch
 
             rpmBuildcmd += ' --define \"_build %s\"' % buildTuple
-            rpmBuildcmd += ' --define \"_host %s\"' % hostTuple
+            rpmBuildcmd += ' --define \"_host %s\"' % constants.targetArchTuple
             rpmBuildcmd += ' --define \"cross_compile 1\"'
             
             self.logger.debug("Searching for macro file: %s" % localTargetMacroPath)
@@ -294,9 +293,12 @@ class PackageUtils(object):
             else:
                 rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
                 rpmBuildcmd += ' --define \"_datarootdir /usr/share\"'
-                rpmBuildcmd += ' --define \"__strip %s-strip\"' % hostTuple
+                rpmBuildcmd += ' --define \"__strip %s-strip\"' % constants.targetArchTuple
                 rpmBuildcmd += ' --define \"__objdump %s-objdump\"' % hostTuple
-            rpmBuildcmd += ' --target=' + constants.targetArch + '-unknown-' + constants.targetArchSuffix
+
+            # Target should be informat of cpu-vendor-os (e.g. arm-unknown-linux)
+            tupleParts = constants.targetArchTuple.split('-')
+            rpmBuildcmd += ' --target=%s-%s-%s' % (tupleParts[0], tupleParts[1], tupleParts[2])
             
         rpmBuildcmd += " " + specFile
 

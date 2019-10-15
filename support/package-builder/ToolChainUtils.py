@@ -114,15 +114,11 @@ class ToolChainUtils(object):
             targetPackageName = packageName
             packageName = None
             packageVersion = None
+
+            tupleParts = constants.targetArchTuple.split('-')
             
-            listRPMsToInstall.extend(['binutils-'+constants.targetArch+'-'+constants.targetArchSuffix,
-                                      'gcc-'+constants.targetArch+'-'+constants.targetArchSuffix])
-                                      
-            #listRPMsToInstall.extend(['binutils-'+constants.targetArch+'-linux-gnu',
-            #                          'gcc-'+constants.targetArch+'-linux-gnu'])
-            #self.logger.debug(">>>> Target package name: %s", targetPackageName)
-            #self.logger.debug(">>>> List RPMs to install:")
-            #self.logger.info(listRPMsToInstall)
+            listRPMsToInstall.extend(['binutils-%s-%s-%s' % (tupleParts[0], tupleParts[2], tupleParts[3]),
+                                      'gcc-%s-%s-%s' % (tupleParts[0], tupleParts[2], tupleParts[3])])
         if packageName:
             #self.logger.debug(">>>> Getting dependent packages for %s", packageName)
             listBuildRequiresPackages = self.getListDependentPackages(packageName, packageVersion)
