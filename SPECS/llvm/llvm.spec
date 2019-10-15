@@ -93,8 +93,12 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLVM_TARGETS_TO_BUILD="ARM" \
       -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
       -DLLVM_TABLEGEN=%{llvm_host_install_dir}/usr/bin/llvm-tblgen \
+      -DCMAKE_CROSSCOMPILING=True \
+      -DLLVM_DEFAULT_TARGET_TRIPLE=%{_host} \
+      -DLLVM_TARGET_ARCH=ARM \
+      -DLLVM_TARGETS_TO_BUILD=ARM \
 %else
-      -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
+      -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF;ARM" \
 %endif
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -Wno-dev ..

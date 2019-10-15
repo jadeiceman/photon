@@ -1,15 +1,15 @@
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        6.0.1
+Version:        8.0.1
 Release:        1%{?dist}
 License:        NCSA
 URL:            http://lldb.llvm.org
 Group:          Development/Tools
 Vendor:         VMware, Inc.
 Distribution:   Photon
-Source0:        http://releases.llvm.org/%{version}/%{name}-%{version}.src.tar.xz
-%define sha1    lldb=907a32c7170067f485121a1e8ff793b16d1ff491
+Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
+%define sha1    lldb=3333ac8f4208d12b863a016a89e1aa40b75ab918
 BuildRequires:  cmake
 BuildRequires:  llvm-devel = %{version}
 BuildRequires:  clang-devel = %{version}
@@ -17,6 +17,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  swig
 BuildRequires:  zlib-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  python2-devel
 Requires:       llvm = %{version}
 Requires:       clang = %{version}
 Requires:       ncurses
@@ -37,7 +38,6 @@ for developing applications that use lldb.
 %package -n python-lldb
 Summary:        Python module for lldb
 Requires:       %{name} = %{version}-%{release}
-BuildRequires:  python2-devel
 Requires:       python-six
 
 %description -n python-lldb
@@ -94,6 +94,8 @@ rm -rf %{buildroot}/*
 %{python2_sitelib}/*
 
 %changelog
+*   Mon Oct 14 2019 Jonathan Chiu <jochi@microsoft.com> 8.0.1-1
+-   Update to version 8.0.1
 *   Thu Aug 09 2018 Srivatsa S. Bhat <srivatsa@csail.mit.edu> 6.0.1-1
 -   Update to version 6.0.1 to get it to build with gcc 7.3
 -   Make python2_sitelib macro global to fix build error.

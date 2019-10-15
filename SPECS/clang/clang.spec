@@ -53,10 +53,13 @@ else
 
     cmake -DCMAKE_INSTALL_PREFIX=/usr           \
           -DCMAKE_BUILD_TYPE=Release            \
+          -DLLVM_CONFIG=/usr/bin/llvm-config    \
           -Wno-dev ..
 
     make %{?_smp_mflags}
     make DESTDIR=%{host_install_dir} install
+    # For some reason clang-tblgen isn't installed to /usr/bin so we need to manually copy it
+    cp ./bin/clang-tblgen %{host_install_dir}/usr/bin/ -v
     cd ..
 fi
 
@@ -87,10 +90,18 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr   \
 %ifarch arm
       -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
       -DCLANG_TABLEGEN=%{host_install_dir}/usr/bin/clang-tblgen \
+      -DCMAKE_CROSSCOMPILING=True \
+      -DLLVM_TARGETS_TO_BUILD=ARM \
+      -DLLVM_TOOLS_BINARY_DIR=/usr/bin \
 %else
       -DLLVM_CONFIG=/usr/bin/llvm-config \
 %endif
       -Wno-dev ..
+
+%ifarch arm
+# Fix include file path
+sed -i 's:include "llvm/Option/OptParser.td":include "/target-%{_arch}/usr/include/llvm/Option/OptParser.td":g' ../include/clang/Driver/Options.td
+%endif
 
 make %{?_smp_mflags}
 

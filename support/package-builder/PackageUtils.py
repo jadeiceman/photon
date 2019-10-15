@@ -282,7 +282,7 @@ class PackageUtils(object):
             localTargetMacroPath = sandbox.getID() + targetMacroPath
             macroPath = '/etc/rpm/macros.%s' % constants.targetArch
 
-            rpmBuildcmd += ' --define \"_build %\"' % buildTuple
+            rpmBuildcmd += ' --define \"_build %s\"' % buildTuple
             rpmBuildcmd += ' --define \"_host %s\"' % hostTuple
             rpmBuildcmd += ' --define \"cross_compile 1\"'
             
