@@ -269,7 +269,7 @@ class ToolChainUtils(object):
         CommandUtils.runCommandInShell(cmd, logfn=self.logger.debug)
 
         if rpmFiles != "":
-            cmd = (self.rpmCommand+" -Uvh --nodeps --ignorearch --ignoreos --noscripts --root "+
+            cmd = (self.rpmCommand+" -Uvh --nodeps --ignorearch --noscripts --root "+
                    chroot.getID() +"/target-"+ constants.targetArch+
                    " --define \'_dbpath /var/lib/rpm\' "+rpmFiles)
             retVal = CommandUtils.runCommandInShell(cmd, logfn=self.logger.debug)

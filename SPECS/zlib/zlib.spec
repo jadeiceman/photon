@@ -20,7 +20,8 @@ for handling compiled objects.
 %prep
 %setup -q
 %build
-%configure
+CC="%{_host}-gcc" ./configure \
+    --prefix=%{_prefix}
 make V=1 %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
