@@ -32,6 +32,8 @@ with PKZIP or Info-ZIP utilities, primarily in a DOS environment.
 %patch5 -p1
 
 %build
+sed -i 's/CC=gcc LD=gcc/unzips CC=%{_host}-gcc LD=%{_host}-gcc/g' unix/Makefile
+
 case `uname -m` in
   i?86)
     sed -i -e 's/DASM_CRC"/DASM_CRC -DNO_LCHMOD"/' unix/Makefile

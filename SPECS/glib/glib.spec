@@ -19,6 +19,8 @@ BuildRequires:	which
 BuildRequires:	python-xml
 BuildRequires:	python2 >= 2.7
 BuildRequires:	python2-libs >= 2.7
+BuildRequires:  util-linux-devel
+BuildRequires:  elfutils-libelf-devel
 Requires:	pcre-libs
 Requires:	libffi
 Provides:	pkgconfig(glib-2.0)
@@ -58,7 +60,27 @@ Gsettings schemas compiling tool
 
 %build
 ./autogen.sh
-%configure --with-pcre=system
+
+%ifarch arm
+cat << EOF >> %{_host}.cache
+ac_cv_type_long_long=yes
+glib_cv_stack_grows=no
+glib_cv_uscore=no
+ac_cv_func_posix_getpwuid_r=yes
+ac_cv_func_posix_getgrgid_r=yes
+EOF
+%endif
+
+CONFIGURE_OPTS="\
+    --with-pcre=system \
+%ifarch arm
+    --cache-file=%{_host}.cache \
+    --with-sysroot=/target-%{_arch} \
+%endif
+"
+
+%configure $CONFIGURE_OPTS
+
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install

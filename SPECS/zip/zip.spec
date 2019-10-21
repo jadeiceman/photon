@@ -14,6 +14,13 @@ The Zip package contains Zip utilities.
 %prep
 %setup -qn zip30
 %build
+export CC="%{_host}-gcc"
+export CXX="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
 make -f unix/Makefile generic_gcc %{?_smp_mflags}
 %install
 install -v -m755 -d %{buildroot}%{_bindir}

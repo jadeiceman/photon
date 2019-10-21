@@ -8,6 +8,9 @@
 # perl-CPANPLUS.
 %bcond_without coro
 
+%global perl_version 5.28.0
+%global perl_cross_version 1.3
+
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.641
@@ -19,11 +22,15 @@ URL:            http://dbi.perl.org/
 # license is not a FSF free license.
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
 #Source0:        DBI-%{version}_repackaged.tar.gz
+%if "%{?cross_compile}" != ""
+Source1:        http://www.cpan.org/src/5.0/perl-%{perl_version}.tar.gz
+Source2:        https://github.com/arsv/perl-cross/releases/download/%{perl_cross_version}/perl-cross-%{perl_cross_version}.tar.gz
+%endif
 %define sha1 DBI=d14c34fac2dd058905b0b8237a4ca8b86eed6f5d
 Vendor:		VMware, Inc.
 Distribution:	Photon
-BuildRequires:  perl >= 5.28.0
-Requires:	perl >= 5.28.0
+BuildRequires:  perl >= %{perl_version}
+Requires:	perl >= %{perl_version}
 
 %description
 DBI is a database access Application Programming Interface (API) for
@@ -62,23 +69,57 @@ for F in lib/DBI/W32ODBC.pm lib/Win32/DBIODBC.pm; do
     sed -i -e '\|^'"$F"'|d' MANIFEST
 done
 
-%build
-export CC="%{_host}-gcc"
-export CXX="%{_host}-g++"
-export AR="%{_host}-ar"
-export AS="%{_host}-as"
-export RANLIB="%{_host}-ranlib"
-export LD="%{_host}-ld"
-export STRIP="%{_host}-strip"
+%if "%{?cross_compile}" != ""
+echo "Setting up perl cross-compile..."
+%setup -q -b 2 -n perl-cross-%{perl_cross_version}
+%setup -q -b 1 -n perl-%{perl_version}
+cp -r %{_builddir}/perl-cross-%{perl_cross_version}/* . -v
+cp -r %{_builddir}/DBI-%{version} cpan/ -v
+%endif
 
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" CC=$CC AR=$AR LD=$LD RANLIB=$RANLIB
-make
+%build
+%if "%{?cross_compile}" != ""
+CONFIGURE_OPTS="\
+    --prefix=%{_prefix} \
+    --target=%{_host} \
+    -Dvendorprefix=%{_prefix} \
+    -Dman1dir=%{_mandir}/man1 \
+    -Dman3dir=%{_mandir}/man3 \
+    -Duseshrplib \
+    -Dusethreads \
+    -DPERL_RANDOM_DEVICE=/dev/erandom \
+    --only-mod= \
+"
+./configure $CONFIGURE_OPTS
+
+# Make miniperl
+make %{?_smp_mflags}
+
+#sed -i 's:exec $top/miniperl:exec perl:g' miniperl_top
+cd cpan/DBI-%{version}
+../../miniperl_top Makefile.PL PERL_CORE=1 PERL=../../miniperl_top INSTALLDIRS=vendor
+
+%else
+CFLAGS="%{optflags}" perl Makefile.PL INSTALLDIRS=vendor
+%endif
+
+make %{?_smp_mflags} OPTIMIZE="%{optflags}"
 
 %install
+%if "%{?cross_compile}" != ""
+# Install spits out extra files because of the cross compile, so ignore them
+%define _unpackaged_files_terminate_build 0
+cd cpan/DBI-%{version}
+%endif
+
 make pure_install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name .packlist -exec rm -f {} ';'
 find %{buildroot} -type f -name '*.bs' -empty -exec rm -f {} ';'
 %{_fixperms} '%{buildroot}'/*
+
+%ifarch arm
+%global perl_vendorarch %(%{_builddir}/perl-%{perl_version}/miniperl_top -V:vendorarch | cut -d "'" -f 2)
+%endif
 
 %check
 make test
@@ -86,7 +127,7 @@ make test
 %files
 %{_bindir}/dbipro*
 %{_bindir}/dbilogstrip
-%{perl_vendorarch}/*.p*
+%{perl_vendorarch}/dbi*.p*
 %{perl_vendorarch}/DBD/
 %{perl_vendorarch}/DBI/
 %{perl_vendorarch}/auto/DBI/

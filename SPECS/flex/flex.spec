@@ -28,9 +28,12 @@ flex.
 %setup -q
 sed -i -e '/test-bison/d' tests/Makefile.in
 %build
-CFLAGS="-D_GNU_SOURCE" \
+export CFLAGS="-D_GNU_SOURCE"
 %configure \
 	--prefix=%{_prefix} \
+%ifarch arm
+    --disable-bootstrap \
+%endif
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \
 	--disable-silent-rules
 make VERBOSE=1 %{?_smp_mflags}

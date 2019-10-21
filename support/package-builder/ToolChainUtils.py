@@ -105,12 +105,8 @@ class ToolChainUtils(object):
         packages = ""
         listBuildRequiresPackages = []
 
-        #self.logger.debug(">>>> Available Packages:")
-        #self.logger.info(availablePackages)
-
         listRPMsToInstall=list(constants.listToolChainRPMsToInstall)
         if constants.crossCompiling:
-            self.logger.debug(">>>> CrossCompiling = true")
             targetPackageName = packageName
             packageName = None
             packageVersion = None
@@ -120,7 +116,6 @@ class ToolChainUtils(object):
             listRPMsToInstall.extend(['binutils-%s-%s-%s' % (tupleParts[0], tupleParts[2], tupleParts[3]),
                                       'gcc-%s-%s-%s' % (tupleParts[0], tupleParts[2], tupleParts[3])])
         if packageName:
-            #self.logger.debug(">>>> Getting dependent packages for %s", packageName)
             listBuildRequiresPackages = self.getListDependentPackages(packageName, packageVersion)
         for package in listRPMsToInstall:
             pkgUtils = PackageUtils(self.logName, self.logPath)
@@ -138,27 +133,18 @@ class ToolChainUtils(object):
                 version = SPECS.getData(constants.buildArch).getHighestVersion(package)
 
             if availablePackages is not None:
-                #self.logger.debug(">>>> availablePackages is not None")
                 basePkg = SPECS.getData(constants.buildArch).getSpecName(package)+"-"+version
                 isAvailable = basePkg in availablePackages
-                #self.logger.debug(">>>> basePkg: %s", basePkg)
-                #self.logger.debug(">>>> availablePackages:")
-                #self.logger.info(availablePackages)
-                #self.logger.debug(">>>> isAvailable: %r", isAvailable)
             else:
                 # if availablePackages is not provided (rear case) it is safe
                 # to use findRPMFile()
                 isAvailable = True
 
             if constants.rpmCheck:
-                #self.logger.debug(">>>> constants.rpmCheck = true")
                 rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
             
-            #self.logger.debug(">>>> Finding RPM file: %s", package)
             rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
             
-            #self.logger.debug(">>>> rpmFile is None = %r", rpmFile is None)
-
             if rpmFile is None:
                 # Honor the toolchain list order.
                 # if index of depended package ('package') is more

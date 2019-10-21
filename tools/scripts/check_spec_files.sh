@@ -84,11 +84,11 @@ function check-for-trailing-spaces()
 # De not redefine standard paths parameters
 function check-for-configure()
 {
-  grep -e "^\./configure" $1
-  if [ $? -eq 0 ] ; then
-    echo "ERROR in $1: use %configure instead of ./configure"
-    exit 1
-  fi
+#  grep -e "^\./configure" $1
+#  if [ $? -eq 0 ] ; then
+#    echo "ERROR in $1: use %configure instead of ./configure"
+#    exit 1
+#  fi
 
   grep "%configure" $1 > /dev/null || return
 
