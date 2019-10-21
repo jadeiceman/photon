@@ -1,0 +1,91 @@
+--- ../BUILD/libxml2-2.9.8/libtool_original	2019-10-09 20:56:50.279148423 +0000
++++ ../BUILD/libxml2-2.9.8/libtool	2019-10-09 20:57:54.571175816 +0000
+@@ -4772,9 +4772,16 @@
+ 	dir=$func_dirname_result
+ 	func_append dir "$objdir"
+ 
+-	if test -n "$relink_command"; then
++        if test "$fast_install" = no && test -n "$relink_command"; then
++      # Strip any trailing slash from the destination.
++      func_stripname '' '/' "$libdir"
++      destlibdir=$func_stripname_result
++
++      func_stripname '' '/' "$destdir"
++      s_destdir=$func_stripname_result
++
+ 	  # Determine the prefix the user has applied to our future dir.
+-	  inst_prefix_dir=`$ECHO "$destdir" | $SED -e "s%$libdir\$%%"`
++	  inst_prefix_dir=`$ECHO "X$s_destdir" | $Xsed -e "s%$destlibdir\$%%"`
+ 
+ 	  # Don't allow the user to place us outside of our expected
+ 	  # location b/c this prevents finding dependent libraries that
+@@ -4804,7 +4811,7 @@
+ 	  shift
+ 
+ 	  srcname=$realname
+-	  test -n "$relink_command" && srcname=${realname}T
++	  test "$fast_install" = no && test -n "$relink_command" && srcname="$realname"T
+ 
+ 	  # Install the shared library and build the symlinks.
+ 	  func_show_eval "$install_shared_prog $dir/$srcname $destdir/$realname" \
+@@ -8593,15 +8600,15 @@
+ 	    # Hardcode the library path.
+ 	    # Skip directories that are in the system default run-time
+ 	    # search path.
+-	    case " $sys_lib_dlsearch_path " in
+-	    *" $absdir "*) ;;
+-	    *)
+-	      case "$compile_rpath " in
+-	      *" $absdir "*) ;;
+-	      *) func_append compile_rpath " $absdir" ;;
+-	      esac
+-	      ;;
+-	    esac
++	    #case " $sys_lib_dlsearch_path " in
++	    #*" $absdir "*) ;;
++	    #*)
++	    #  case "$compile_rpath " in
++	    #  *" $absdir "*) ;;
++	    #  *) func_append compile_rpath " $absdir" ;;
++	    #  esac
++	    #  ;;
++	    #esac
+ 	    case " $sys_lib_dlsearch_path " in
+ 	    *" $libdir "*) ;;
+ 	    *)
+@@ -8667,15 +8674,15 @@
+ 	    # Hardcode the library path.
+ 	    # Skip directories that are in the system default run-time
+ 	    # search path.
+-	    case " $sys_lib_dlsearch_path " in
+-	    *" $absdir "*) ;;
+-	    *)
+-	      case "$compile_rpath " in
+-	      *" $absdir "*) ;;
+-	      *) func_append compile_rpath " $absdir" ;;
+-	      esac
+-	      ;;
+-	    esac
++	    #case " $sys_lib_dlsearch_path " in
++	    #*" $absdir "*) ;;
++	    #*)
++	    #  case "$compile_rpath " in
++	    #  *" $absdir "*) ;;
++	    #  *) func_append compile_rpath " $absdir" ;;
++	    #  esac
++	    #  ;;
++	    #esac
+ 	    case " $sys_lib_dlsearch_path " in
+ 	    *" $libdir "*) ;;
+ 	    *)
+@@ -9021,8 +9028,8 @@
+ 		  eval libdir=`$SED -n -e 's/^libdir=\(.*\)$/\1/p' $deplib`
+ 		  test -z "$libdir" && \
+ 		    func_fatal_error "'$deplib' is not a valid libtool archive"
+-		  test "$absdir" != "$libdir" && \
+-		    func_warning "'$deplib' seems to be moved"
++		  #test "$absdir" != "$libdir" && \
++		  #  func_warning "'$deplib' seems to be moved"
+ 
+ 		  path=-L$absdir
+ 		fi

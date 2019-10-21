@@ -11,6 +11,7 @@ Source0:	http://ftp.gnome.org/pub/gnome/sources/glib/2.58/%{name}-%{version}.tar
 %define sha1 glib=c00e433c56e0ba3541abc5222aeca4136de10fb8
 Patch0:         glib-CVE-2019-12450.patch
 Patch1:         glib-CVE-2019-13012.patch
+Patch2:         libtool-2.4.6-fixinstall_trailingslash.patch
 BuildRequires:	pcre-devel
 BuildRequires:	libffi-devel
 BuildRequires:	pkg-config
@@ -83,6 +84,10 @@ CONFIGURE_OPTS="\
 
 make %{?_smp_mflags}
 %install
+%ifarch arm
+    patch libtool < %{_sourcedir}/libtool-2.4.6-fixinstall_trailingslash.patch
+%endif
+
 make DESTDIR=%{buildroot} install
 
 %post	-p /sbin/ldconfig

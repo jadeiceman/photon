@@ -277,7 +277,7 @@ class PackageUtils(object):
 
         if constants.crossCompiling:
             buildTuple = '%s-unknown-linux-gnu' % constants.buildArch
-            targetMacroPath = '%s/macros/macros_%s' % (constants.topDirPath, constants.targetArch)
+            targetMacroPath = '%s/macros/macros.%s' % (constants.topDirPath, constants.targetArch)
             localTargetMacroPath = sandbox.getID() + targetMacroPath
             macroPath = '/etc/rpm/macros.%s' % constants.targetArch
 
