@@ -4,6 +4,7 @@ Version:        1.8.2
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://ninja-build.org
+Group:          Development/Tools
 Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        https://github.com/ninja-build/ninja/archive/%{name}-%{version}.tar.gz
@@ -24,6 +25,9 @@ and it is designed to run builds as fast as possible.
 
 %build
 python3 configure.py --bootstrap --verbose
+%if "%{?cross_compile}" != ""
+sed -i 's/g++/%{_host}-g++/g' build.ninja
+%endif
 ./ninja -v all
 
 %install

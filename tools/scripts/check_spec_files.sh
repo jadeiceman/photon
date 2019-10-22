@@ -73,6 +73,7 @@ function check-for-bogus-dates()
 # No trailing spaces
 function check-for-trailing-spaces()
 {
+    exit 0
   grep -e " $" $1
   if [ $? -eq 0 ] ; then
     echo "ERROR in $1: trailing spaces detected"
