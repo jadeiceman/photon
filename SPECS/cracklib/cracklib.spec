@@ -26,9 +26,9 @@ Requires(postun): /bin/rm
 CrackLib tests passwords to determine whether they match certain
 security-oriented characteristics. You can use CrackLib to stop
 users from choosing passwords which would be easy to guess. CrackLib
-performs certain tests: 
+performs certain tests:
 
-* It tries to generate words from a username and gecos entry and 
+* It tries to generate words from a username and gecos entry and
   checks those words against the password;
 * It checks for simplistic patterns in passwords;
 * It checks for the password in a dictionary.
@@ -265,7 +265,7 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 -   Fix CVE-2016-6318, trigger for cracklib-dicts
 -   Trigger for dynamic symlink for dict
 *   Sun Nov 20 2016 Alexey Makhalov <amakhalov@vmware.com> 2.9.6-4
--   Revert compressing pw_dict.pwd back. Python code 
+-   Revert compressing pw_dict.pwd back. Python code
     cracklib.VeryFascistCheck does not handle it.
 *   Tue Nov 15 2016 Alexey Makhalov <amakhalov@vmware.com> 2.9.6-3
 -   Remove any dicts from cracklib main package
