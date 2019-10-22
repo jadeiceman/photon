@@ -1,3 +1,7 @@
+%ifarch arm
+%global _lib64dir %{_libdir}
+%endif
+
 Summary:	Google's C++ gtest framework
 Name:		gtest
 Version:	1.8.1
@@ -53,17 +57,37 @@ This contains libgmock static library.
 %setup -n googletest-release-%{version}
 
 %build
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=OFF .
+%ifarch arm
+%define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
+
+cat << EOF >> %{cmake_toolchain_file}
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR %{_arch})
+
+set(CMAKE_SYSROOT /target-%{_arch})
+
+set(CMAKE_C_COMPILER %{_bindir}/%{_host}-gcc)
+set(CMAKE_CXX_COMPILER %{_bindir}/%{_host}-g++)
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+EOF
+
+%endif
+
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=OFF -DCMAKE_TOOLCHAIN_FILE=%{?cmake_toolchain_file} .
 make
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=ON .
+cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DBUILD_SHARED_LIBS=ON -DCMAKE_TOOLCHAIN_FILE=%{?cmake_toolchain_file} .
 make
 
 %install
 make DESTDIR=%{buildroot} install
-install -p -m 644 -t %{buildroot}/usr/lib64 googlemock/libgmock.a
-install -p -m 644 -t %{buildroot}/usr/lib64 googlemock/libgmock_main.a
-install -p -m 644 -t %{buildroot}/usr/lib64 googlemock/gtest/libgtest.a
-install -p -m 644 -t %{buildroot}/usr/lib64 googlemock/gtest/libgtest_main.a
+install -p -m 644 -t %{buildroot}/%{_lib64dir} googlemock/libgmock.a
+install -p -m 644 -t %{buildroot}/%{_lib64dir} googlemock/libgmock_main.a
+install -p -m 644 -t %{buildroot}/%{_lib64dir} googlemock/gtest/libgtest.a
+install -p -m 644 -t %{buildroot}/%{_lib64dir} googlemock/gtest/libgtest_main.a
 install -vdm 755 %{buildroot}/usr/src/gtest/src/
 install -vdm 755 %{buildroot}/usr/src/gmock/src/
 cp googletest/src/* %{buildroot}/usr/src/gtest/src/
