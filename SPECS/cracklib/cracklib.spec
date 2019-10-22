@@ -1,5 +1,7 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%{!?python2_inc: %define python2_inc %(python2 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
+%{!?python3_inc: %define python3_inc %(python3 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
 # Got this spec from http://downloads.sourceforge.net/cracklib/cracklib-2.9.6.tar.gz
 
 Summary:        A password strength-checking library.
@@ -111,7 +113,6 @@ mkdir -p dicts
 install %{SOURCE1} dicts/
 
 %build
-
 CFLAGS="$RPM_OPT_FLAGS" %configure \
   --prefix=%{_prefix} \
   --mandir=%{_mandir} \
@@ -122,18 +123,61 @@ CFLAGS="$RPM_OPT_FLAGS" %configure \
   --without-python
 
 make
+
+export CC="%{_host}-gcc"
+export LDSHARED="%{_host}-gcc -pthread -shared"
+
 pushd python
-python2 setup.py build
-python3 setup.py build
+
+python2 setup.py build_ext \
+    -I/target-%{_arch}/%{python2_inc} \
+    -L/target-%{_arch}/usr/lib
+
+python3 setup.py build_ext \
+    -I/target-%{_arch}/%{python3_inc} \
+    -L/target-%{_arch}/usr/lib
+
 popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT/
-chmod 755 ./util/cracklib-format
-chmod 755 ./util/cracklib-packer
-util/cracklib-format dicts/cracklib* | util/cracklib-packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/words
-echo password | util/cracklib-packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/empty
+
+%define cracklib_format ./util/cracklib-format
+%define cracklib_packer ./util/cracklib-packer
+
+# To generate the next set of files we need to build a
+# native version of cracklib
+%if "%{?cross_compile}" != ""
+echo "Building cracklib for %{_build}..."
+
+make distclean
+mkdir -p build_host
+cd build_host
+
+CFLAGS="$RPM_OPT_FLAGS" ../configure \
+  --prefix=%{_prefix} \
+  --mandir=%{_mandir} \
+  --libdir=%{_libdir} \
+  --libexecdir=%{_libdir} \
+  --datadir=%{_datadir} \
+  --disable-static \
+  --without-python
+make
+
+%define cracklib_format %{_builddir}/cracklib-%{version}/util/cracklib-format
+%define cracklib_packer %{_builddir}/cracklib-%{version}/build_host/util/cracklib-packer
+%endif
+
+chmod 755 %cracklib_format
+chmod 755 %cracklib_packer
+
+#util/cracklib-format dicts/cracklib* | util/cracklib-packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/words
+#echo password | util/cracklib-packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/empty
+
+%cracklib_format dicts/cracklib* | %cracklib_packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/words
+echo password | %cracklib_packer $RPM_BUILD_ROOT/%{_datadir}/cracklib/empty
+
 rm -f $RPM_BUILD_ROOT/%{_datadir}/cracklib/cracklib-small
 ln -s cracklib-format $RPM_BUILD_ROOT/%{_sbindir}/mkdict
 ln -s cracklib-packer $RPM_BUILD_ROOT/%{_sbindir}/packer
