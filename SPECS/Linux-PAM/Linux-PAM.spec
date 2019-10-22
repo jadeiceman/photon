@@ -9,10 +9,11 @@ Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        http://linux-pam.org/library/%{name}-%{version}.tar.bz2
 %define sha1    Linux-PAM=e956252e81d824c35a60c9b50919ca0767f8a8ec
+Patch0:         libtool-2.4.2-fixinstall_trailingslash.patch
 BuildRequires:  cracklib-devel
 Requires:       cracklib
 %description
-The Linux PAM package contains Pluggable Authentication Modules used to 
+The Linux PAM package contains Pluggable Authentication Modules used to
 enable the local system administrator to choose how applications authenticate users.
 
 %package lang
@@ -35,15 +36,26 @@ for developing applications that use Linux-PAM.
 %setup -q
 %build
 
-%configure \
+CONFIGURE_OPTS="\
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \
     --libdir=%{_libdir} \
+    --sbindir=/sbin \
     --sysconfdir=/etc   \
     --enable-securedir=/usr/lib/security \
-    --docdir=%{_docdir}/%{name}-%{version}
+    --docdir=%{_docdir}/%{name}-%{version} \
+%if "%{?cross_compile}" != ""
+    --with-sysroot=/target-%{_arch}
+%endif
+"
+%configure $CONFIGURE_OPTS
 
 make %{?_smp_mflags}
+
+%if "%{?cross_compile}" != ""
+    patch libtool < %{_sourcedir}/libtool-2.4.2-fixinstall_trailingslash.patch
+%endif
+
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
