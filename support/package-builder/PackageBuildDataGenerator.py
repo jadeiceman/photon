@@ -36,6 +36,19 @@ class PackageBuildDataGenerator(object):
         self._getSortedBuildOrderList()
         return self.__mapCyclesToPackageList, self.__mapPackageToCycle, self.__sortedPackageList
 
+    def getSortListForPackage(self, pkg):
+        #creating sort list for package
+        sortListForPkg = self._createSortListForPkg(pkg)
+
+        #remove any cyclic packages in sortListForPkg if they already
+        #exists in sortedList
+        circularDependentPackages = self._getCircularDependentPackages(pkg)
+        for p in circularDependentPackages:
+            if p in sortedList and p in sortListForPkg:
+                sortListForPkg.remove(p)
+
+        return sortListForPkg
+
     #todo
     def _findAllPackagesToBuild(self):
         return list(self.__buildDependencyGraph.keys())
@@ -85,7 +98,6 @@ class PackageBuildDataGenerator(object):
             if pkg is None:
                 pkg = completeListPackagesToBuild.pop()
                 packageIndexInSortedList = len(sortedList)
-
             #creating sort list for package
             sortListForPkg = self._createSortListForPkg(pkg)
 

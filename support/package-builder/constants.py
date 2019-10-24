@@ -36,6 +36,7 @@ class constants(object):
     targetArchTuple = None
     crossCompiling = False
     currentArch = buildArch
+    customPackageList = None
 
     noDepsPackageList = [
         "texinfo",

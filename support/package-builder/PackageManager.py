@@ -129,11 +129,22 @@ class PackageManager(object):
             self.logger.debug("List of already available packages:")
             self.logger.debug(self.listOfPackagesAlreadyBuilt)
 
+        if constants.currentArch == "arm":
+            self.logger.debug(">>>> LOADING CUSTOM PACKAGE LIST")
+            f = open("phase1_package_list.txt", "r")
+            constants.customPackageList = f.read().splitlines()
+            f.close()
+        #else:
+        #    listPackagesToBuild = copy.copy(listPackages)
+
         listPackagesToBuild = copy.copy(listPackages)
+
         for pkg in listPackages:
             if (pkg in self.listOfPackagesAlreadyBuilt and
-                    not constants.rpmCheck):
+                    not constants.rpmCheck and
+                    pkg in listPackagesToBuild):                
                 listPackagesToBuild.remove(pkg)
+                self.logger.debug(">>>> REMOVED: %s" % pkg)
 
         if constants.rpmCheck:
             self.sortedPackageList = listPackagesToBuild
@@ -145,8 +156,174 @@ class PackageManager(object):
             self.logger.info("List of packages yet to be built...")
             self.logger.info(str(set(self.sortedPackageList) - set(self.listOfPackagesAlreadyBuilt)))
             self.logger.info("")
+            
+            ## Analyze pkgs to be built, but exclude ones with python or perl dependencies
+            #allStagedPkgs = []
+
+            #stagedPkgs, remainingPkgs = self._analyzePackages(listPackages,
+            #        ["python2-2.7.15", "python3-3.7.3", "perl-5.28.0"])
+
+            #allStagedPkgs = allStagedPkgs + stagedPkgs
+
+            #stagedPkgs, remainingPkgs = self._analyzePackages(listPackages,
+            #        ["perl-5.28.0"],
+            #        remainingPkgs,
+            #        allStagedPkgs,
+            #        "python_")
+
+            #allStagedPkgs = allStagedPkgs + stagedPkgs
+
+            ##stagedPkgs, remainingPkgs = self._analyzePackages(listPackages,
+            ##        ["python2-2.7.15", "python3-3.7.3"],
+            ##        remainingPkgs,
+            ##        allStagedPkgs,
+            ##        "perl_")
+
+            ##allStagedPkgs = allStagedPkgs + stagedPkgs
+
+            ## Analyze the remaining packages that have exclusions
+            #if len(remainingPkgs) > 0:
+            #    self.logger.debug("Remaining pkgs:\n  > %s\n\n" % "\n  > ".join(remainingPkgs))
+            #    self._analyzePackages(listPackages, 
+            #            None, 
+            #            remainingPkgs,
+            #            allStagedPkgs,
+            #            "remaining_")
+
+            #raise NameError("Done")
 
         return True
+
+    def _analyzePackages(self, 
+            listPackages, 
+            problemDeps = None, 
+            packagesToBuild = None,
+            additionalPackages = None,
+            prefix = None,
+            packagesToFlag = ["python2-2.7.15", "python3-3.7.3", "perl-5.28.0"]):
+
+        self.logger.debug("\n\n>>>> Analyzing packages...")
+
+        outputDir = os.getcwd() + "/_analyzePackagesOutput"
+        self.logger.debug("Creating output directory (%s)..." % outputDir)
+        os.makedirs(outputDir, mode=0o777, exist_ok=True)
+
+#        problemDeps = ["python2-2.7.15", "python3-3.7.3", "perl-5.28.0"]
+        
+        excludeProblemDeps = problemDeps != None
+
+        # Use default if none specified
+        if packagesToBuild == None:
+            packagesToBuild = set(self.sortedPackageList) - set(self.listOfPackagesAlreadyBuilt)
+
+        if additionalPackages == None:
+            additionalPackages = set()
+
+        if prefix == None:
+            prefix = ""
+
+        pkgBuildDataGen = PackageBuildDataGenerator(self.logName, self.logPath)
+        pkgBuildDataGen.getPackageBuildData(listPackages)
+
+        stageNum = 1
+        stageDict = {}
+        problemDict = {}
+        while len(packagesToBuild) > 0:
+            if stageNum not in stageDict.keys():
+                stageDict[stageNum] = []
+
+            nextPackagesToBuild = packagesToBuild.copy()
+
+            for pkg in packagesToBuild:
+                depListForPkg = pkgBuildDataGen.getSortListForPackage(pkg)
+
+                # Remove itself from list
+                depListForPkg.remove(pkg)
+                depSet = set(depListForPkg)
+
+                if excludeProblemDeps:
+                    # Check if it has a problem dep
+                    foundProblem = None
+                    for problemDep in set(problemDeps):
+                        if problemDep in depSet:
+                            if problemDep not in problemDict.keys():
+                                problemDict[problemDep] = []
+                            problemDict[problemDep].append(pkg)
+                            nextPackagesToBuild.remove(pkg)
+                            foundProblem = problemDep
+                            break
+
+                    if foundProblem is not None:
+                        self.logger.debug("Problem dep detected (%s), skipping %s..." % (foundProblem, pkg))
+                        continue
+
+                depSatisfied = True
+                if len(depSet) > 0:
+                    stageDeps = self._flatten(stageDict.values())
+                    # For each dependency, go through the previous stage's packages and the list of already built packages 
+                    # to see if the dependency pkg is there
+                    for dep in depSet:
+                        if (dep in (set(stageDeps) - set(stageDict[stageNum])) 
+                         or dep in set(self.listOfPackagesAlreadyBuilt)
+                         or dep in additionalPackages):
+                            # Dep found, move on to next one
+                            continue
+                        else:
+                            # Couldn't find dep in previous stage or already built pkgs
+                            # self.logger.debug(">>> Couldn't find %s for %s" % (dep, pkg))
+                            depSatisfied = False
+                            break
+
+                # If all dep pkgs have been built or will be, add it to the stage
+                if depSatisfied:
+                    stageDict[stageNum].append(pkg)
+                    nextPackagesToBuild.remove(pkg)
+
+            #self.logger.debug("Next packages to build (%s): %s)" % (len(nextPackagesToBuild), nextPackagesToBuild))
+            self.logger.debug("\nStage %s (%s): %s\n" % (stageNum, len(stageDict[stageNum]), stageDict[stageNum]))
+            packagesToBuild = nextPackagesToBuild.copy()
+
+            # Output the stage's pkgs to a file
+            if len(stageDict[stageNum]) > 0:
+                  f = open(outputDir + "/%s__stage_%s_packages.txt" % (prefix, stageNum), "w")
+                  f.write("\n".join(stageDict[stageNum]))
+                  f.close()
+
+            # Check to see if no new packages have been added to the current stage and the previous one
+            # This means that the remaining pkgs have deps that weren't in the original full pkg list
+            if stageNum > 1 and len(stageDict[stageNum]) == 0 and len(stageDict[stageNum-1]) == 0:
+                self.logger.debug("Current stage and previous stage have no packages")
+
+                # List the remaining packages
+                if len(packagesToBuild) > 0:
+                    self.logger.debug("Remaining packages to build:")
+                    for pkg in packagesToBuild:
+                        depListForPkg = pkgBuildDataGen.getSortListForPackage(pkg)
+                        depListForPkg.remove(pkg)
+                        stageDeps = self._flatten(stageDict.values())
+                        if problemDeps == None:
+                            problemDeps = []
+                        depListForPkg = [x for x in depListForPkg if x not in stageDeps + list(self.listOfPackagesAlreadyBuilt) or x in problemDeps]
+
+                    print("%s\n  > %s" % (pkg, "\n  > ".join(depListForPkg)))
+                break
+
+            stageNum += 1
+
+        stageList = []
+        for stageNum, pkgList in stageDict.items():
+            for pkg in pkgList:
+                flaggedDeps = list(set(packagesToFlag) & set(pkgBuildDataGen.getSortListForPackage(pkg)))
+                stageList.append("%s,%s,%s" % (pkg, stageNum, "/".join(flaggedDeps)))
+
+        f = open(outputDir + "/%s__stage_all_packages.csv" % prefix, "w")
+        f.write("\n".join(stageList))
+        f.close()
+
+        return self._flatten(stageDict.values()), list(packagesToBuild) + self._flatten(problemDict.values())
+
+    def _flatten(self, listOfLists):
+        return [item for sublist in listOfLists for item in sublist]
 
     def _buildTestPackages(self, buildThreads):
         self.buildToolChain()
