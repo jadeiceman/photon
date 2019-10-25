@@ -1,5 +1,8 @@
 %global goroot          /usr/lib/golang
 %global gopath          %{_datadir}/gocode
+%ifarch arm
+%global gohostarch      arm
+%endif
 %ifarch aarch64
 %global gohostarch      arm64
 %else
