@@ -1,12 +1,15 @@
 %global goroot          /usr/lib/golang
 %global gopath          %{_datadir}/gocode
-%ifarch arm
-%global gohostarch      arm
-%endif
 %ifarch aarch64
 %global gohostarch      arm64
 %else
 %global gohostarch      amd64
+%endif
+
+%if "%{?cross_compile}" != ""
+%ifarch arm
+%global goarch arm
+%endif
 %endif
 %define debug_package %{nil}
 %define __strip /bin/true
@@ -40,6 +43,11 @@ export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOROOT_BOOTSTRAP=%{goroot}
 
+%if "%{?cross_compile}" != ""
+export GOOS=linux
+export GOARCH=%{goarch}
+%endif
+
 export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
@@ -49,6 +57,10 @@ pushd src
 popd
 
 %install
+%if "%{?cross_compile}" != ""
+%define gohostarch %{goarch}
+%endif
+
 rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{_bindir}
