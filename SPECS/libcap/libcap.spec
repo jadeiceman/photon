@@ -26,6 +26,12 @@ for developing applications that use libcap.
 %prep
 %setup -q
 %build
+%if "%{?cross_compile}" != ""
+    cd libcap
+    make _makenames
+    cd ..
+    sed -i 's/CC := gcc/CC := %{_host}-gcc/g' Make.Rules
+%endif
 sed -i 's:LIBDIR:PAM_&:g' pam_cap/Makefile
 make %{?_smp_mflags}
 %install

@@ -25,6 +25,9 @@ This is useful for object-oriented scripting.
 %setup -q
 %build
 %configure \
+%if "%{?cross_compile}" != ""
+        --with-baseruby=/usr/bin/ruby \
+%endif
         --enable-shared \
         --docdir=%{_docdir}/%{name}-%{version}
 make %{?_smp_mflags} COPY="cp -p"
