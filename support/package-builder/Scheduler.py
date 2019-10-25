@@ -604,10 +604,10 @@ class Scheduler(object):
                     canBuild = False
                     break
 
-            if canBuild and constants.currentArch == "arm":
-                canBuild = pkg in constants.customPackageList
-                if not canBuild:
-                    Scheduler.logger.debug(">>>> %s is not in custom package list" % pkg)
+            #if canBuild and constants.currentArch == "arm":
+            #    canBuild = pkg in constants.customPackageList
+            #    if not canBuild:
+            #        Scheduler.logger.debug(">>>> %s is not in custom package list" % pkg)
 
             if canBuild:
                 Scheduler.listOfPackagesNextToBuild.put((-Scheduler._getPriority(pkg), pkg))

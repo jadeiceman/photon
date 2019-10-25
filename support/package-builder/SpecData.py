@@ -247,6 +247,7 @@ class SpecData(object):
             if specName in self.mapSpecObjects:
                 return specName
         self.logger.error("Could not find " + package + " package from specs")
+        self.logger.error("self.mapPackageToSpec: %s" % self.mapPackageToSpec)
         raise Exception("Invalid package:" + package)
 
     def isRPMPackage(self, package):

@@ -129,11 +129,11 @@ class PackageManager(object):
             self.logger.debug("List of already available packages:")
             self.logger.debug(self.listOfPackagesAlreadyBuilt)
 
-        if constants.currentArch == "arm":
-            self.logger.debug(">>>> LOADING CUSTOM PACKAGE LIST")
-            f = open("phase1_package_list.txt", "r")
-            constants.customPackageList = f.read().splitlines()
-            f.close()
+        #if constants.currentArch == "arm":
+        #    self.logger.debug(">>>> LOADING CUSTOM PACKAGE LIST")
+        #    f = open("phase1_package_list.txt", "r")
+        #    constants.customPackageList = f.read().splitlines()
+        #    f.close()
         #else:
         #    listPackagesToBuild = copy.copy(listPackages)
 
@@ -144,7 +144,7 @@ class PackageManager(object):
                     not constants.rpmCheck and
                     pkg in listPackagesToBuild):                
                 listPackagesToBuild.remove(pkg)
-                self.logger.debug(">>>> REMOVED: %s" % pkg)
+                #self.logger.debug(">>>> REMOVED: %s" % pkg)
 
         if constants.rpmCheck:
             self.sortedPackageList = listPackagesToBuild
@@ -161,7 +161,7 @@ class PackageManager(object):
             #allStagedPkgs = []
 
             #stagedPkgs, remainingPkgs = self._analyzePackages(listPackages,
-            #        ["python2-2.7.15", "python3-3.7.3", "perl-5.28.0"])
+            #        ["python2-2.7.15", "python3-3.7.3", "perl-5.28.0", "automake-1.16.1"])
 
             #allStagedPkgs = allStagedPkgs + stagedPkgs
 
@@ -285,7 +285,7 @@ class PackageManager(object):
 
             # Output the stage's pkgs to a file
             if len(stageDict[stageNum]) > 0:
-                  f = open(outputDir + "/%s__stage_%s_packages.txt" % (prefix, stageNum), "w")
+                  f = open(outputDir + "/%s__st%s_packages.txt" % (prefix, stageNum), "w")
                   f.write("\n".join(stageDict[stageNum]))
                   f.close()
 
@@ -316,7 +316,7 @@ class PackageManager(object):
                 flaggedDeps = list(set(packagesToFlag) & set(pkgBuildDataGen.getSortListForPackage(pkg)))
                 stageList.append("%s,%s,%s" % (pkg, stageNum, "/".join(flaggedDeps)))
 
-        f = open(outputDir + "/%s__stage_all_packages.csv" % prefix, "w")
+        f = open(outputDir + "/%s__st_all_packages.csv" % prefix, "w")
         f.write("\n".join(stageList))
         f.close()
 

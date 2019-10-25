@@ -29,15 +29,18 @@ function check_rpm {
             printf "\n\n"
             # exit 1
             isGood=0
-            FAILED_CHECK+=($FILE_INFO)
+            FAILED_CHECK+=($file)
         fi
     done
     cd ..
     rm -rf $TEMP_DIR
-
-    printf "\n\nFound problems in the following files in $FILE_NAME:"
-    printf "\n"
-    printf '  %s\n' "${FAILED_CHECK[@]}"
+    if [ ${#FAILED_CHECK[@]} -gt 0 ]; then
+        printf "\n\nFound problems in the following files in $FILE_NAME:"
+        printf "\n"
+        printf '  %s\n' "${FAILED_CHECK[@]}"
+    else
+        printf "\n\nNo issues found in $FILE_NAME.\n"
+    fi
     return $isGood
 }
 

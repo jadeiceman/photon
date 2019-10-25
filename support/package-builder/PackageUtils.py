@@ -307,7 +307,7 @@ class PackageUtils(object):
         
         sandbox.run("uname -a", logfile = logFile, logfn = self.logger.debug)
 
-        returnVal = sandbox.run(rpmBuildcmd, logfile = logFile)
+        returnVal = sandbox.run(rpmBuildcmd, logfile = logFile, showOutput = True)
 
         if constants.rpmCheck and package in constants.testForceRPMS:
             if (not SPECS.getData().isCheckAvailable(package, version)) or \

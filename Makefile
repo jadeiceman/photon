@@ -142,6 +142,31 @@ packages-minimal: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SO
 		$(PACKAGE_WEIGHTS) \
 		--threads ${THREADS}
 
+packages-json: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURCES) generate-dep-lists
+	@echo "Building RPMS from $(PKG_JSON_INPUT)..."
+	@echo ""
+	@cd $(PHOTON_PKG_BUILDER_DIR) && \
+	$(PHOTON_PACKAGE_BUILDER) \
+		--spec-path $(PHOTON_SPECS_DIR) \
+		--rpm-path $(PHOTON_RPMS_DIR) \
+		--source-path $(PHOTON_SRCS_DIR) \
+		--build-root-path $(PHOTON_CHROOT_PATH) \
+		--packages-json-input $(PKG_JSON_INPUT) \
+		--log-path $(PHOTON_LOGS_DIR) \
+		--log-level $(LOGLEVEL) \
+		--publish-RPMS-path $(PHOTON_PUBLISH_RPMS_DIR) \
+		--pullsources-config $(PHOTON_PULLSOURCES_CONFIG) \
+		--dist-tag $(PHOTON_DIST_TAG) \
+		--build-number $(PHOTON_BUILD_NUMBER) \
+		--release-version $(PHOTON_RELEASE_VERSION) \
+		--pkginfo-file $(PHOTON_PKGINFO_FILE) \
+		$(PHOTON_RPMCHECK_FLAGS) \
+		$(PUBLISH_BUILD_DEPENDENCIES) \
+		$(PACKAGE_WEIGHTS) \
+		$(CROSS_TARGET_FLAGS) \
+		$(CROSS_TUPLE_FLAGS) \
+		--threads ${THREADS}
+
 packages: check-docker-py check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_XRPMS) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURCES) $(CONTAIN) check-spec-files generate-dep-lists
 	@echo "Building all RPMS..."
 	@echo ""
@@ -419,7 +444,7 @@ photon-docker-image:
 k8s-docker-images: start-docker photon-docker-image
 	mkdir -p $(PHOTON_STAGE)/docker_images && \
 	cd ./support/dockerfiles/k8s-docker-images && \
-	./build-k8s-base-image.sh $(PHOTON_RELEASE_VERSION) $(PHOTON_BUILD_NUMBER) $(PHOTON_STAGE)  && \
+	./build-k8s-base-image.sh $(PHOTON_RELEASE_VERSION) $(PHOTON_BUILD_NUMBER) $(PHOTON_STAGE)	&& \
 	./build-k8s-docker-images.sh $(PHOTON_DIST_TAG) $(PHOTON_RELEASE_VERSION) $(PHOTON_SPECS_DIR) $(PHOTON_STAGE) && \
 	./build-k8s-metrics-server-image.sh $(PHOTON_DIST_TAG) $(PHOTON_RELEASE_VERSION) $(PHOTON_SPECS_DIR) $(PHOTON_STAGE)  && \
 	./build-k8s-coredns-image.sh $(PHOTON_DIST_TAG) $(PHOTON_RELEASE_VERSION) $(PHOTON_SPECS_DIR) $(PHOTON_STAGE)  && \

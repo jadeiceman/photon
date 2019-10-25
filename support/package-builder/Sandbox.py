@@ -110,10 +110,10 @@ class Chroot(Sandbox):
         self._unmountAll(chrootID)
         self._removeChroot(chrootID)
 
-    def run(self, cmd, logfile=None, logfn=None):
+    def run(self, cmd, logfile=None, logfn=None, showOutput=False):
         self.logger.debug("Chroot.run() cmd: " + self.chrootCmdPrefix + cmd)
         cmd = cmd.replace('"', '\\"')
-        return CommandUtils.runCommandInShell(self.chrootCmdPrefix + cmd, logfile, logfn)
+        return CommandUtils.runCommandInShell(self.chrootCmdPrefix + cmd, logfile, logfn, showOutput)
 
     def put(self, src, dest):
         shutil.copy2(src, self.chrootID + dest)

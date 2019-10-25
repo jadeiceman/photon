@@ -25,12 +25,22 @@ class CommandUtils:
         return result.decode().split()
 
     @staticmethod
-    def runCommandInShell(cmd, logfile=None, logfn=None):
+    def runCommandInShell(cmd, logfile=None, logfn=None, showOutput=False):
         retval = 0
-        if logfn:
-            process = subprocess.Popen("%s" %cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            retval = process.wait()
-            logfn(process.communicate()[0].decode())
+        if logfn or showOutput:
+            if logfn == None: logfn = print
+            process = subprocess.Popen("%s" %cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
+            if not showOutput:
+                retval = process.wait()
+                logfn(process.communicate()[0].decode())
+            else:
+                print(">>> Showing output...")
+                while process.poll() is None:
+                    output = process.stdout.readline().decode()
+                    if not output: break
+                    else: print(" > %s" % output.strip())
+                logfn(process.communicate()[0].decode())
+                retval = process.poll()
         else:
             if logfile is None:
                 logfile = os.devnull
