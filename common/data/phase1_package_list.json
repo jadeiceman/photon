@@ -48,7 +48,6 @@
  "distrib-compat",
  "go",
  "c-rest-engine",
- "crash",
  "inotify-tools",
  "tcl",
  "fuse",

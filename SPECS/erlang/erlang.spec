@@ -19,9 +19,20 @@ erlang programming language
 %build
 export ERL_TOP=`pwd`
 ./otp_build autoconf
-sh configure --disable-hipe --prefix=%{_prefix}
 
+%if "%{?cross_compile}" != ""
+# Build bootstrap system
+./configure --enable-bootstrap-only
 make
+
+# Cross build
+%configure --disable-hipe
+make
+
+%else
+sh configure --disable-hipe --prefix=%{_prefix}
+make
+%endif
 
 %install
 
