@@ -26,26 +26,37 @@ class CommandUtils:
 
     @staticmethod
     def runCommandInShell(cmd, logfile=None, logfn=None, showOutput=False):
+        # print(">> runCommandInShell: %s" % cmd)
+        # print(">> logfile: %s, logfn: %s, showOutput: %s" % (logfile, logfn, showOutput))
+
         retval = 0
-        if logfn or showOutput:
-            if logfn == None: logfn = print
-            process = subprocess.Popen("%s" %cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)
-            if not showOutput:
-                retval = process.wait()
-                logfn(process.communicate()[0].decode())
+        process = subprocess.Popen("%s" %cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1 if showOutput else -1)
+        
+        if logfile is None and logfn is None:
+            logfile = os.devnull
+        elif logfile and logfn:
+            logfile = None
+
+        f = None
+        if logfile:
+            f = open(logfile, "w")
+
+        while process.poll() is None:
+            output = process.stdout.readline().decode()
+            if not output: break
             else:
-                print(">>> Showing output...")
-                while process.poll() is None:
-                    output = process.stdout.readline().decode()
-                    if not output: break
-                    else: print(" > %s" % output.strip())
-                logfn(process.communicate()[0].decode())
-                retval = process.poll()
-        else:
-            if logfile is None:
-                logfile = os.devnull
-            with open(logfile, "w") as f:
-                process = subprocess.Popen("%s" %cmd, shell=True, stdout=f, stderr=f)
-            retval = process.wait()
+                if showOutput:
+                    print(" | %s" % output.strip())
+                if f:
+                    f.write(output.strip())
+
+        if f:
+            f.close()
+
+        if logfn:
+            logfn(process.communicate()[0].decode())
+
+        retval = process.poll()
+        
         return retval
 

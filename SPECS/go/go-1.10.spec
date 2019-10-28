@@ -6,6 +6,12 @@
 %global gohostarch      amd64
 %endif
 
+%if "%{?cross_compile}" != ""
+%ifarch arm
+%global goarch arm
+%endif
+%endif
+
 # rpmbuild magic to keep from having meta dependency on libc.so.6
 #%define _use_internal_dependency_generator 0
 #%define __find_requires %{nil}
@@ -35,6 +41,11 @@ export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOROOT_BOOTSTRAP=%{goroot}
 
+%if "%{?cross_compile}" != ""
+export GOOS=linux
+export GOARCH=%{goarch}
+%endif
+
 export GOROOT="`pwd`"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
@@ -44,6 +55,10 @@ pushd src
 popd
 
 %install
+%if "%{?cross_compile}" != ""
+%define gohostarch %{goarch}
+%endif
+
 rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{_bindir}

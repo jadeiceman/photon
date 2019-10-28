@@ -361,7 +361,6 @@ class PackageManager(object):
 
         for i in range(0, buildThreads):
             workerName = "WorkerThread" + str(i)
-            self.logger.debug(">>>> Starting worker thread: %s", workerName)
             ThreadPool.addWorkerThread(workerName)
             ThreadPool.startWorkerThread(workerName)
 

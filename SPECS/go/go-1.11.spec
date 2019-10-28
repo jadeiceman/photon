@@ -11,6 +11,7 @@
 %global goarch arm
 %endif
 %endif
+
 %define debug_package %{nil}
 %define __strip /bin/true
 

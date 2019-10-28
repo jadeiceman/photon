@@ -144,6 +144,12 @@ class PackageUtils(object):
                     SPECS.getData().isCheckAvailable(package, version)):
                 cmd = ("sed -i '/^Executing(%check):/,/^Processing files:/{//!b};d' " + logFilePath)
                 CommandUtils().runCommandInShell(cmd, logfn=self.logger.debug)
+            if constants.crossCompiling:
+                for f in listRPMFiles:
+                    cmd = "%s/../tools/scripts/check-rpm-arch.sh %s" % (constants.topDirPath, f)
+                    retVal = CommandUtils().runCommandInShell(cmd, logfn=self.logger.debug, showOutput=True)
+                    if retVal != 0:
+                        raise NameError("%s failed %s architecture check" % (f, constants.targetArch))
         self.logger.debug("RPM build is successful")
 
     def findRPMFile(self, package,version="*",arch=None, throw=False):

@@ -97,6 +97,8 @@ class ToolChainUtils(object):
     def getListDependentPackages(self, package, version):
         listBuildRequiresPkg=SPECS.getData(constants.buildArch).getBuildRequiresForPackage(package, version)
         listBuildRequiresPkg.extend(SPECS.getData(constants.buildArch).getCheckBuildRequiresForPackage(package, version))
+        listBuildRequiresPkg.extend(SPECS.getData(constants.buildArch).getExtraBuildRequiresForPackage(package, version))
+        self.logger.debug("ExtraBuildRequires: %s" % SPECS.getData(constants.buildArch).getExtraBuildRequiresForPackage(package, version))
         return listBuildRequiresPkg
 
     def installToolchainRPMS(self, chroot, packageName=None, packageVersion=None, usePublishedRPMS=True, availablePackages=None):
@@ -108,8 +110,11 @@ class ToolChainUtils(object):
         listRPMsToInstall=list(constants.listToolChainRPMsToInstall)
         if constants.crossCompiling:
             targetPackageName = packageName
+            targetPackageVersion = packageVersion
             packageName = None
             packageVersion = None
+
+            self.logger.debug(">>>> targetPackageName: %s, targetPackageVersion: %s" % (targetPackageName, targetPackageVersion))
 
             tupleParts = constants.targetArchTuple.split('-')
             
@@ -195,6 +200,7 @@ class ToolChainUtils(object):
             self.installExtraToolchainRPMS(chroot, packageName, packageVersion)
 
         if constants.crossCompiling:
+            self.installExtraToolchainRPMS(chroot, targetPackageName, targetPackageVersion)
             self.installTargetToolchain(chroot, targetPackageName)
 
     def installExtraToolchainRPMS(self, sandbox, packageName, packageVersion):
