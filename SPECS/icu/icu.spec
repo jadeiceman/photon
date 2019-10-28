@@ -19,7 +19,17 @@ It contains the libraries and header files to create applications
 %prep
 %setup -q -n %{name}/source
 %build
-%configure --prefix=%{_prefix}
+%define build_host_dir %{_builddir}/%{name}/source
+%if "%{?cross_compile}" != ""
+./configure --prefix=/usr
+make %{?_smp_mflags}
+mkdir -p build_target
+cd build_target
+%define _configure ../configure
+%configure --with-cross-build=%{build_host_dir}
+%else
+%configure
+%endif
 make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
