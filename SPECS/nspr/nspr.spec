@@ -9,6 +9,7 @@ Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        http://ftp.mozilla.org/pub/nspr/releases/v%{version}/src/%{name}-%{version}.tar.gz
 %define sha1    nspr=ef1e2ca3205fd1658a69ada2e0436266ca3065b5
+Patch0:         cross_compile_fix.patch
 
 %description
 Netscape Portable Runtime (NSPR) provides a platform-neutral API
@@ -28,6 +29,10 @@ sed -i 's#$(LIBRARY) ##' config/rules.mk
 
 %build
 cd nspr
+%if "%{?cross_compile}" != ""
+    patch configure.in < %{_sourcedir}/cross_compile_fix.patch
+    autoreconf -i
+%endif
 %configure \
     --prefix=%{_prefix} \
     --bindir=%{_bindir} \

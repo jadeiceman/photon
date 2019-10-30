@@ -150,6 +150,8 @@ class PackageUtils(object):
                     retVal = CommandUtils().runCommandInShell(cmd, logfn=self.logger.debug, showOutput=True)
                     if retVal != 0:
                         raise NameError("%s failed %s architecture check" % (f, constants.targetArch))
+                    else:
+                        self.logger.debug("RPM passed architecture check")
         self.logger.debug("RPM build is successful")
 
     def findRPMFile(self, package,version="*",arch=None, throw=False):

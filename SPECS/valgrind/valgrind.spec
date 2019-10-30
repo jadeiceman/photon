@@ -25,6 +25,10 @@ programs.
 %patch0 -p1
 
 %build
+%if "%{?cross_compile}" != ""
+sed -i -e "s#armv7#arm#g" configure
+%endif
+
 %configure --prefix=%{_prefix}
 make
 

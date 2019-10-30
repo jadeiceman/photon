@@ -3,7 +3,7 @@ Name:           nss
 Version:        3.39
 Release:        1%{?dist}
 License:        MPLv2.0
-URL:            http://ftp.mozilla.org/pub/security/nss/releases/NSS_3_39_RTM/src/%{name}-%{version}.tar.gz
+URL:            http://ftp.mozilla.org/pub/security/nss/releases/NSS_3_47_RTM/src/%{name}-%{version}.tar.gz
 Group:          Applications/System
 Vendor:         VMware, Inc.
 Distribution:   Photon
@@ -44,13 +44,29 @@ This package contains minimal set of shared nss libraries.
 %setup -q
 %patch -p1
 %build
+export CC="%{_host}-gcc"
+export CCC="%{_host}-g++"
+export AR="%{_host}-ar"
+export AS="%{_host}-as"
+export RANLIB="%{_host}-ranlib"
+export LD="%{_host}-ld"
+export STRIP="%{_host}-strip"
+
 cd nss
 # -j is not supported by nss
 make VERBOSE=1 BUILD_OPT=1 \
     NSPR_INCLUDE_DIR=%{_includedir}/nspr \
     USE_SYSTEM_ZLIB=1 \
     ZLIB_LIBS=-lz \
+%if "%{?cross_compile}" != ""
+    NATIVE_CC=cc \
+    CROSS_COMPILE=1 \
+%endif
+%ifarch arm
+    OS_TEST=arm \
+%else
     USE_64=1 \
+%endif
     $([ -f %{_includedir}/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)
 %install
 cd nss
@@ -59,7 +75,11 @@ install -vdm 755 %{buildroot}%{_bindir}
 install -vdm 755 %{buildroot}%{_includedir}/nss
 install -vdm 755 %{buildroot}%{_libdir}
 install -v -m755 Linux*/lib/*.so %{buildroot}%{_libdir}
+%if "%{?cross_compile}" != ""
+install -v -m644 Linux*/lib/libcrmf.a %{buildroot}%{_libdir}
+%else
 install -v -m644 Linux*/lib/{*.chk,libcrmf.a} %{buildroot}%{_libdir}
+%endif
 cp -v -RL {public,private}/nss/* %{buildroot}%{_includedir}/nss
 chmod 644 %{buildroot}%{_includedir}/nss/*
 install -v -m755 Linux*/bin/{certutil,nss-config,pk12util} %{buildroot}%{_bindir}
@@ -78,7 +98,9 @@ sudo -u test ./all.sh && userdel test -r -f
 %files
 %defattr(-,root,root)
 %{_bindir}/*
+%if "%{?cross_compile}" == ""
 %{_libdir}/*.chk
+%endif
 %{_libdir}/*.so
 %exclude %{_libdir}/libfreeblpriv3.so
 %exclude %{_libdir}/libnss3.so

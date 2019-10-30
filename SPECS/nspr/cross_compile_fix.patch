@@ -1,0 +1,53 @@
+--- configure.in.orig	2018-08-28 12:42:28.000000000 +0000
++++ configure.in	2019-10-30 01:14:37.545517607 +0000
+@@ -552,8 +552,8 @@
+ dnl ========================================================
+ dnl Checks for compilers.
+ dnl ========================================================
+-if test "$target" != "$host"; then
+-    echo "cross compiling from $host to $target"
++if test "$target" != "$build"; then
++    echo "cross compiling from $build to $target"
+     cross_compiling=yes
+ 
+     case "$build:$target" in
+@@ -582,7 +582,7 @@
+ AC_PROG_CC
+ 
+ dnl Reenter the conditional blocks after invoking AC_PROG_CC.
+-if test "$target" != "$host"; then
++if test "$target" != "$build"; then
+     if test -n "$USE_CPLUS"; then
+         AC_CHECK_PROGS(CXX, $CXX "${target_alias}-g++" "${target}-g++", echo)
+         unset ac_cv_prog_CXX
+@@ -610,7 +610,7 @@
+     _SAVE_CFLAGS="$CFLAGS"
+     _SAVE_LDFLAGS="$LDFLAGS"
+ 
+-    AC_MSG_CHECKING([for $host compiler])
++    AC_MSG_CHECKING([for $build compiler])
+     AC_CHECK_PROGS(HOST_CC, $HOST_CC gcc cc /usr/ucb/cc, "")
+     if test -z "$HOST_CC"; then
+         AC_MSG_ERROR([no acceptable cc found in \$PATH])
+@@ -621,10 +621,10 @@
+     CFLAGS="$HOST_CFLAGS"
+     LDFLAGS="$HOST_LDFLAGS"
+ 
+-    AC_MSG_CHECKING([whether the $host compiler ($HOST_CC $HOST_CFLAGS $HOST_LDFLAGS) works])
++    AC_MSG_CHECKING([whether the $build compiler ($HOST_CC $HOST_CFLAGS $HOST_LDFLAGS) works])
+     AC_TRY_COMPILE([], [return 0;],
+         [AC_MSG_RESULT([yes])],
+-        [AC_MSG_ERROR([installation or configuration problem: $host compiler $HOST_CC cannot create executables.])] )
++        [AC_MSG_ERROR([installation or configuration problem: $build compiler $HOST_CC cannot create executables.])] )
+ 
+     CC=$_SAVE_CC
+     CFLAGS=$_SAVE_CFLAGS
+@@ -1199,7 +1199,7 @@
+ dnl ========================================================
+ dnl Override of system specific host options
+ dnl ========================================================
+-case "$host" in
++case "$build" in
+ *-mingw*|*-msys*)
+     NSINSTALL=nsinstall
+     ;;

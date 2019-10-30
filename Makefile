@@ -142,8 +142,8 @@ packages-minimal: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SO
 		$(PACKAGE_WEIGHTS) \
 		--threads ${THREADS}
 
-packages-json: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURCES) generate-dep-lists
-	@echo "Building RPMS from $(PKG_JSON_INPUT)..."
+packages-%: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURCES) generate-dep-lists
+	@echo "Building rpms for $@..."
 	@echo ""
 	@cd $(PHOTON_PKG_BUILDER_DIR) && \
 	$(PHOTON_PACKAGE_BUILDER) \
@@ -151,7 +151,7 @@ packages-json: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURC
 		--rpm-path $(PHOTON_RPMS_DIR) \
 		--source-path $(PHOTON_SRCS_DIR) \
 		--build-root-path $(PHOTON_CHROOT_PATH) \
-		--packages-json-input $(PKG_JSON_INPUT) \
+		--packages-json-input $(PHOTON_DATA_DIR)/packages_$*.json \
 		--log-path $(PHOTON_LOGS_DIR) \
 		--log-level $(LOGLEVEL) \
 		--publish-RPMS-path $(PHOTON_PUBLISH_RPMS_DIR) \
@@ -161,10 +161,10 @@ packages-json: check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURC
 		--release-version $(PHOTON_RELEASE_VERSION) \
 		--pkginfo-file $(PHOTON_PKGINFO_FILE) \
 		$(PHOTON_RPMCHECK_FLAGS) \
+		$(CROSS_TARGET_FLAGS) \
+        $(CROSS_TUPLE_FLAGS) \
 		$(PUBLISH_BUILD_DEPENDENCIES) \
 		$(PACKAGE_WEIGHTS) \
-		$(CROSS_TARGET_FLAGS) \
-		$(CROSS_TUPLE_FLAGS) \
 		--threads ${THREADS}
 
 packages: check-docker-py check-tools $(PHOTON_STAGE) $(PHOTON_PUBLISH_XRPMS) $(PHOTON_PUBLISH_RPMS) $(PHOTON_SOURCES) $(CONTAIN) check-spec-files generate-dep-lists
