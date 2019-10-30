@@ -23,7 +23,11 @@ sed -i 's:= @mkdir_p@:= /bin/mkdir -p:' po/Makefile.in.in
 
 %configure --disable-silent-rules
 
-make %{?_smp_mflags}
+%if "%{?cross_compile}" != ""
+make %{?_smp_mflags} || sed -i '/rpl_$/d' lib/config.h && make %{?_smp_mflags}
+%else
+make %{?_smp_mflags} 
+%endif
 
 %install
 make DESTDIR=%{buildroot} install

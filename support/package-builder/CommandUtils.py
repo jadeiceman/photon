@@ -48,7 +48,7 @@ class CommandUtils:
                     if showOutput:
                         print(" | %s" % output.strip())
                     if f:
-                        f.write(output.strip())
+                        f.write(output.strip() + "\n")
 
             if f:
                 f.close()

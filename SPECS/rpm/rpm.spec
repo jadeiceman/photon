@@ -1,5 +1,7 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+%{!?python2_inc: %define python2_inc %(python2 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
+%{!?python3_inc: %define python3_inc %(python3 -c "from distutils.sysconfig import get_python_inc;print(get_python_inc())")}
 
 Summary:        Package manager
 Name:           rpm
@@ -16,6 +18,7 @@ Source1:        macros
 Source2:        brp-strip-debug-symbols
 Source3:        brp-strip-unneeded
 Patch0:         find-debuginfo-do-not-generate-dir-entries.patch
+Patch1:         libtool-2.4.6-fixinstall_trailingslash.patch
 Requires:       bash
 Requires:       libdb
 Requires:       rpm-libs = %{version}-%{release}
@@ -96,7 +99,11 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
 
 ./autogen.sh --noconfigure
 %configure \
+%if "%{?cross_compile}" != ""
+    CPPFLAGS='-I/target-%{_arch}/usr/include/nspr -I/target-%{_arch}/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
+%else
     CPPFLAGS='-I/usr/include/nspr -I/usr/include/nss -DLUA_COMPAT_APIINTCASTS' \
+%endif
         --program-prefix= \
         --disable-dependency-tracking \
         --disable-static \
@@ -107,10 +114,25 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
         --with-external-db
 make %{?_smp_mflags}
 
+%if "%{?cross_compile}" != ""
+patch libtool < %{_sourcedir}/libtool-2.4.6-fixinstall_trailingslash.patch
+export CC="%{_host}-gcc"
+export LDSHARED="%{_host}-gcc -pthread -shared"
 pushd python
-python2 setup.py build
-python3 setup.py build
+python2 setup.py build_ext \
+    -I/target-%{_arch}/%{python2_inc} \
+    -L/target-%{_arch}/usr/lib
+
+python3 setup.py build_ext \
+    -I/target-%{_arch}/%{python3_inc} \
+    -L/target-%{_arch}/usr/lib
 popd
+%else
+    pushd python
+    python2 setup.py build
+    python3 setup.py build
+    popd
+%endif
 
 %check
 make check
