@@ -10,6 +10,7 @@ Distribution: Photon
 Source0:	http://www.lua.org/ftp/%{name}-%{version}.tar.gz
 %define sha1 lua=112eb10ff04d1b4c9898e121d6bdf54a81482447
 Patch0:		lua-5.3.4-shared_library-1.patch
+Patch1:     enable-cross-compile.patch
 BuildRequires:	readline-devel
 Requires:	readline
 %description
@@ -26,9 +27,12 @@ Static libraries and header files for the support library for lua
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+
 sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
 sed -i 's/CFLAGS= -fPIC -O2 /CFLAGS= -fPIC -O2 -DLUA_COMPAT_MODULE /' src/Makefile
 %build
+export CROSS_COMPILE=%{_host}-
 make VERBOSE=1 %{?_smp_mflags} linux
 
 %install

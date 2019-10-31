@@ -146,7 +146,9 @@ class PackageUtils(object):
                 CommandUtils().runCommandInShell(cmd, logfn=self.logger.debug)
             if constants.crossCompiling:
                 for f in listRPMFiles:
-                    cmd = "%s/../tools/scripts/check-rpm-arch.sh %s" % (constants.topDirPath, f)
+                    workingDir = os.getcwd()
+                    cmd = "%s/../../tools/scripts/check-rpm-arch.sh %s" % (workingDir, 
+                            constants.rpmPath + "/" + constants.targetArch + "/" + os.path.basename(f))
                     retVal = CommandUtils().runCommandInShell(cmd, logfn=self.logger.debug, showOutput=True)
                     if retVal != 0:
                         raise NameError("%s failed %s architecture check" % (f, constants.targetArch))

@@ -1,0 +1,19 @@
+--- lua-5.3.5/src/Makefile	2019-10-30 17:14:22.859306625 -0700
++++ Makefile	2019-10-30 17:12:02.311258253 -0700
+@@ -6,13 +6,13 @@
+ # Your platform. See PLATS for possible values.
+ PLAT= none
+ 
+-CC= gcc -std=gnu99
++CC= $(CROSS_COMPILE)gcc -std=gnu99
+ CFLAGS= -fPIC -O2 -Wall -Wextra -DLUA_COMPAT_5_2 $(SYSCFLAGS) $(MYCFLAGS)
+ LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
+ LIBS= -lm $(SYSLIBS) $(MYLIBS)
+ 
+-AR= ar rcu
+-RANLIB= ranlib
++AR= $(CROSS_COMPILE)ar rcu
++RANLIB= $(CROSS_COMPILE)ranlib
+ RM= rm -f
+ 
+ SYSCFLAGS=
