@@ -35,11 +35,16 @@ function check_rpm {
     cd ..
     rm -rf $TEMP_DIR
     if [ ${#FAILED_CHECK[@]} -gt 0 ]; then
+        echo -e "\e[31m"
         printf "\n\nFound problems in the following files in $FILE_NAME:"
         printf "\n"
         printf '  %s\n' "${FAILED_CHECK[@]}"
+        echo -e "\e[0m"
     else
-        printf "\n\nNo issues found in $FILE_NAME.\n"
+#        printf "\n\nNo issues found in $FILE_NAME.\n"
+        printf "\n\n"
+        echo -e "\e[92mNo issues found in $FILE_NAME."
+        echo -e "\e[0m"
     fi
     return $isGood
 }

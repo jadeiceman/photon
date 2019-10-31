@@ -29,8 +29,18 @@ These are the additional language files of procps-ng
 
 %prep
 %setup -q
+
 %build
-%configure \
+%if "%{?cross_compile}" != ""
+export ac_cv_func_malloc_0_nonnull=yes
+export ac_cv_func_realloc_0_nonnull=yes
+%endif
+
+./configure \
+%if "%{?cross_compile}" != ""
+    --host=%{_host} \
+    --build=%{_build} \
+%endif
     --prefix=%{_prefix} \
     --exec-prefix= \
     --libdir=%{_libdir} \
@@ -39,6 +49,7 @@ These are the additional language files of procps-ng
     --disable-kill \
     --disable-silent-rules
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
