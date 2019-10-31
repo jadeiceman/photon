@@ -27,7 +27,7 @@ messages in the user's native language.
 CONFIGURE_OPTS="\
         --docdir=%{_defaultdocdir}/%{name}-%{version} \
         --disable-silent-rules \
-%ifarch arm
+%ifarch arm %{arm}
         --with-libncurses-prefix=/target-%{_arch}/usr \
 %endif
 "
@@ -35,7 +35,7 @@ CONFIGURE_OPTS="\
 make %{?_smp_mflags}
 
 %install
-%ifarch arm
+%ifarch arm %{arm}
 # Cross build errors on re-linking .la, so ignore it since .la files are deleted later anyway
 make -i DESTDIR=%{buildroot} install
 %else

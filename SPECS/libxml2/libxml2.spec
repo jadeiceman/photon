@@ -68,7 +68,7 @@ Static libraries and header files for the support library for libxml
 %build
 # Rebuild configure so that PYTHON_INCLUDES can be defined externally
 autoreconf configure.ac
-%ifarch arm
+%ifarch arm %{arm}
 export PYTHON_CROSS_PREFIX=/target-%{_arch}
 %endif
 
@@ -89,7 +89,7 @@ find %{buildroot}/%{_libdir} -name '*.la' -delete
 
 make clean
 
-%ifarch arm
+%ifarch arm %{arm}
 export PYTHON_CROSS_PREFIX=/target-%{_arch}
 %endif
 

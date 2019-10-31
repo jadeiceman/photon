@@ -37,7 +37,7 @@ The boost-static package contains boost static libraries.
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
-%ifarch arm
+%ifarch arm %{arm}
 sed -i 's/using gcc ;/using gcc : %{_arch} : %{_host}-g++ ;/g' project-config.jam
 %endif
 ./b2 %{?_smp_mflags} stage threading=multi

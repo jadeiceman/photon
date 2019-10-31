@@ -57,7 +57,7 @@ CONFIGURE_OPTS="\
     --disable-static \
     --disable-use-tty-group \
     --without-python \
-%ifarch arm
+%ifarch arm %{arm}
     LDFLAGS=-L/target-%{_arch}/usr/lib \
 %endif
 "

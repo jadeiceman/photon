@@ -31,7 +31,7 @@ sed -i -e '/test-bison/d' tests/Makefile.in
 export CFLAGS="-D_GNU_SOURCE"
 %configure \
 	--prefix=%{_prefix} \
-%ifarch arm
+%ifarch arm %{arm}
     --disable-bootstrap \
 %endif
 	--docdir=%{_defaultdocdir}/%{name}-%{version} \

@@ -69,7 +69,7 @@ make %{?_smp_mflags}
 
 sed -i 's:exec $top/miniperl:exec perl:g' miniperl_top
 
-%ifarch arm
+%ifarch arm %{arm}
 %global perl_vendorarch %(%{_builddir}/perl-%{perl_version}/miniperl_top -V:vendorarch | cut -d "'" -f 2)
 %endif
 

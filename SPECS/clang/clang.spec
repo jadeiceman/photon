@@ -87,7 +87,7 @@ cd build
 
 cmake -DCMAKE_INSTALL_PREFIX=/usr   \
       -DCMAKE_BUILD_TYPE=Release    \
-%ifarch arm
+%ifarch arm %{arm}
       -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
       -DCLANG_TABLEGEN=%{host_install_dir}/usr/bin/clang-tblgen \
       -DCMAKE_CROSSCOMPILING=True \
@@ -98,7 +98,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr   \
 %endif
       -Wno-dev ..
 
-%ifarch arm
+%ifarch arm %{arm}
 # Fix include file path
 sed -i 's:include "llvm/Option/OptParser.td":include "/target-%{_arch}/usr/include/llvm/Option/OptParser.td":g' ../include/clang/Driver/Options.td
 %endif

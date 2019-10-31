@@ -34,7 +34,7 @@ These are the header files of libssh2.
 CONFIGURE_OPTS="\
      --disable-static \
      --enable-shared \
-%ifarch arm
+%ifarch arm %{arm}
      --with-libssl-prefix=/target-%{_arch}/%{_libdir} \
 %endif
 "

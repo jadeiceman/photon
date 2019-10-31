@@ -28,7 +28,7 @@ It contains the libraries and header files to create applications
 %prep
 %setup -q
 
-%ifarch arm
+%ifarch arm %{arm}
 %define libdir %{_libdir}
 %else
 %define libdir %{_lib64dir}

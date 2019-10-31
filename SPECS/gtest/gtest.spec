@@ -1,4 +1,4 @@
-%ifarch arm
+%ifarch arm %{arm}
 %global _lib64dir %{_libdir}
 %endif
 
@@ -57,7 +57,7 @@ This contains libgmock static library.
 %setup -n googletest-release-%{version}
 
 %build
-%ifarch arm
+%ifarch arm %{arm}
 %define cmake_toolchain_file %{_builddir}/%{_arch}-toolchain.cmake
 
 cat << EOF >> %{cmake_toolchain_file}

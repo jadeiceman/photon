@@ -195,7 +195,7 @@ CONFIGURE_OPTS="\
      --with-system-expat \
      --with-system-ffi \
      --with-dbmliborder=gdbm:ndbm \
-%ifarch arm
+%ifarch arm %{arm}
      --disable-ipv6 \
      ac_cv_file__dev_ptmx=no \
      ac_cv_file__dev_ptc=no \

@@ -62,7 +62,7 @@ make VERBOSE=1 BUILD_OPT=1 \
     NATIVE_CC=cc \
     CROSS_COMPILE=1 \
 %endif
-%ifarch arm
+%ifarch arm %{arm}
     OS_TEST=arm \
 %else
     USE_64=1 \

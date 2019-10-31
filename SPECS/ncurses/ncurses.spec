@@ -60,7 +60,7 @@ CONFIGURE_OPTS_V6="\
     --with-chtype=long \
     --with-mmask-t=long \
     --disable-silent-rules \
-%ifarch arm
+%ifarch arm %{arm}
     --disable-stripping \
 %endif
 "

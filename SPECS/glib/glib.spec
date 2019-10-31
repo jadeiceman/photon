@@ -62,7 +62,7 @@ Gsettings schemas compiling tool
 %build
 ./autogen.sh
 
-%ifarch arm
+%ifarch arm %{arm}
 cat << EOF >> %{_host}.cache
 ac_cv_type_long_long=yes
 glib_cv_stack_grows=no
@@ -74,7 +74,7 @@ EOF
 
 CONFIGURE_OPTS="\
     --with-pcre=system \
-%ifarch arm
+%ifarch arm %{arm}
     --cache-file=%{_host}.cache \
     --with-sysroot=/target-%{_arch} \
 %endif
@@ -84,7 +84,7 @@ CONFIGURE_OPTS="\
 
 make %{?_smp_mflags}
 %install
-%ifarch arm
+%ifarch arm %{arm}
     patch libtool < %{_sourcedir}/libtool-2.4.6-fixinstall_trailingslash.patch
 %endif
 

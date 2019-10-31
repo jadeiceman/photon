@@ -89,7 +89,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr           \
       -DLLVM_ENABLE_FFI=ON                  \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
-%ifarch arm
+%ifarch arm %{arm}
       -DLLVM_TARGETS_TO_BUILD="ARM" \
       -DCMAKE_TOOLCHAIN_FILE=%{cmake_toolchain_file} \
       -DLLVM_TABLEGEN=%{llvm_host_install_dir}/usr/bin/llvm-tblgen \

@@ -7,7 +7,7 @@
 %endif
 
 %if "%{?cross_compile}" != ""
-%ifarch arm
+%ifarch arm %{arm}
 %global goarch arm
 %endif
 %endif

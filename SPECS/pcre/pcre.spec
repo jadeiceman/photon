@@ -53,7 +53,7 @@ This package contains minimal set of shared pcre libraries.
             --disable-static
 make %{?_smp_mflags}
 
-%ifarch arm
+%ifarch arm %{arm}
 # Patch libtool to fix relinking issue
 patch libtool < %{_sourcedir}/libtool_fix.patch
 %endif

@@ -69,7 +69,7 @@ tar xf %{SOURCE100} --no-same-owner -C ..
 :> %{SOURCE100}
 %endif
 export CFLAGS="%{optflags}"
-%ifarch arm
+%ifarch arm %{arm}
 ./Configure linux-armv4 \
     --prefix=/usr \
     --libdir=lib \

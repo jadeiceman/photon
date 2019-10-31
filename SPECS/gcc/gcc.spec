@@ -99,7 +99,7 @@ sed -i '14597,14600 s/^/#/' libcc1/configure
 
 %build
 %global libdir %{_lib64dir}
-%ifarch arm
+%ifarch arm %{arm}
 %global libdir %{_libdir}
 echo "libdir = %{libdir}"
 %endif
@@ -125,7 +125,7 @@ CONFIGURE_OPTS="\
     --enable-linker-build-id \
     --enable-plugin \
     --with-system-zlib \
-%ifarch arm
+%ifarch arm %{arm}
     --disable-libsanitizer \
     --disable-libquadmath \
 %endif

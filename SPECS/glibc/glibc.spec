@@ -123,7 +123,7 @@ CONFIGURE_OPTS="\
         --enable-bind-now \
         --disable-experimental-malloc \
         --disable-silent-rules \
-%ifarch arm
+%ifarch arm %{arm}
         --with-arch=armv7a \
         --with-fpu=vfp \
         --with-float=hard \

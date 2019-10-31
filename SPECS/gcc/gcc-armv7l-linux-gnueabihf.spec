@@ -35,8 +35,8 @@ Provides: libgcc_s.so.1(GCC_3.0)
 Provides: libgcc_s.so.1(GCC_3.3)
 Provides: libgcc_s.so.1(GCC_4.2.0)
 Provides: libgcc_s.so.1(GLIBC_2.0)
-BuildRequires: binutils-arm-linux-gnueabihf
-Requires: binutils-arm-linux-gnueabihf
+BuildRequires: binutils-armv7l-linux-gnueabihf
+Requires: binutils-armv7l-linux-gnueabihf
 
 %global target_arch armv7l-unknown-linux-gnueabihf
 %global target_linux_arch arm
