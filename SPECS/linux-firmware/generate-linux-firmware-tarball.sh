@@ -25,15 +25,22 @@ cp firmware-nonfree/brcm/brcmfmac43455-sdio.txt $DST/brcm/
 cp firmware-nonfree/LICENCE.broadcom_bcm43xx $DST/
 
 # Dell Edge Gateway requires:
+mkdir $DST/rtl_nic/
+mkdir $DST/mrvl/
 cp -a linux-firmware/rsi $DST/
 cp linux-firmware/rsi_91x.fw $DST/
+cp linux-firmware/rtl_nic/rtl8168f-2.fw $DST/rtl_nic/
+wget -P $DST/mrvl/ https://downloads.dell.com/FOLDER04270570M/1/pcie8897_uapsta.bin
+cp linux-firmware/LICENCE.Marvell $DST/
 
-# NXP ls1012a FRWY requires:
+# NXP ls10XXa FRWY requires:
 cp qoriq-engine-pfe-bin/ls1012a/slow_path/ppfe_class_ls1012a.elf $DST/
 cp qoriq-engine-pfe-bin/ls1012a/slow_path/ppfe_tmu_ls1012a.elf $DST/
 cp qoriq-engine-pfe-bin/NXP-Binary-EULA.txt $DST/
 mkdir -p $DST/ath10k/QCA9377
 cp -a linux-firmware/ath10k/QCA9377/hw1.0 $DST/ath10k/QCA9377/
+mkdir -p $DST/ath10k/QCA6174
+cp -a linux-firmware/ath10k/QCA6174/hw2.1 $DST/ath10k/QCA6174/
 
 # Compulab Fitlet2 requires:
 mkdir $DST/i915

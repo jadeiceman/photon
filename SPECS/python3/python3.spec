@@ -1,18 +1,19 @@
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.7.3
-Release:        2%{?dist}
+Version:        3.7.4
+Release:        3%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
 Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
-%define sha1    Python=e3584650a06ae2765da0678176deae9d133f1b3d
+%define sha1    Python=a862c5a58626fdad02d2047a57771ede2783fcef
 Patch0:         cgi3.patch
 Patch1:         python3-support-photon-platform.patch
-Patch2:         CVE-2019-9740.patch
-Patch3:         CVE-2019-10160.patch
+Patch2:         CVE-2019-16056.patch
+Patch3:         CVE-2019-16935.patch
+
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  ncurses-devel
@@ -32,6 +33,12 @@ Provides:       python(abi)
 Provides:       /usr/bin/python
 Provides:       /bin/python
 Provides:       /bin/python3
+
+%if %{with_check}
+BuildRequires:  iana-etc
+BuildRequires:  tzdata
+BuildRequires:  curl-devel
+%endif
 
 %description
 The Python 3 package contains a new version of Python development environment.
@@ -308,7 +315,6 @@ rm -rf %{buildroot}/*
 %{_bindir}/python3.7m-config
 
 %doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
-%{_libdir}/libpython3.so
 %exclude %{_bindir}/2to3*
 %exclude %{_bindir}/idle*
 
@@ -336,6 +342,15 @@ rm -rf %{buildroot}/*
 %{_libdir}/python3.7/test/*
 
 %changelog
+*   Thu Oct 24 2019 Shreyas B. <shreyasb@vmware.com> 3.7.4-3
+-   Fixed makecheck errors.
+*   Wed Oct 23 2019 Tapas Kundu <tkundu@vmware.com> 3.7.4-2
+-   Fix conflict of libpython3.so
+*   Thu Oct 17 2019 Tapas Kundu <tkundu@vmware.com> 3.7.4-1
+-   Updated to patch release 3.7.4
+-   Fix CVE-2019-16935
+*   Wed Sep 11 2019 Tapas Kundu <tkundu@vmware.com> 3.7.3-3
+-   Fix CVE-2019-16056
 *   Mon Jun 17 2019 Tapas Kundu <tkundu@vmware.com> 3.7.3-2
 -   Fix for CVE-2019-10160
 *   Mon Jun 10 2019 Tapas Kundu <tkundu@vmware.com> 3.7.3-1

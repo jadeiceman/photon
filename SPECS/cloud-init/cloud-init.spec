@@ -1,8 +1,8 @@
 %define python3_sitelib /usr/lib/python3.7/site-packages
 
 Name:           cloud-init
-Version:        18.3
-Release:        5%{?dist}
+Version:        19.1
+Release:        2%{?dist}
 Summary:        Cloud instance init scripts
 Group:          System Environment/Base
 License:        GPLv3
@@ -10,7 +10,7 @@ URL:            http://launchpad.net/cloud-init
 Vendor:         VMware, Inc
 Distribution:   Photon
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
-%define sha1 cloud-init=a317e2add93578d244328dcf97d46fad1c3140f9
+%define sha1 cloud-init=6de398dd755959dde47c8d6f6e255a0857017c44
 Source1:        cloud-photon.cfg
 Source2:        99-disable-networking-config.cfg
 Source3:        dscheck_VMwareGuestInfo
@@ -25,6 +25,10 @@ Patch8:         systemd-resolved-config.patch
 Patch9:         cloud-init-azureds.patch
 Patch10:        ds-identity.patch
 Patch11:        ds-guestinfo-photon.patch
+Patch12:        trigger-post-customization.patch
+Patch13:        enable-disable-custom-script.patch
+Patch14:        disable-custom-script-default.patch
+Patch15:        add_cc_kubeadm.py.patch
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  systemd
@@ -63,6 +67,7 @@ Requires:       python3-xml
 Requires:       python3-jsonschema
 Requires:       python3-deepmerge
 Requires:       python3-netifaces
+Requires:       dhcp-client
 BuildArch:      noarch
 
 %description
@@ -83,6 +88,10 @@ ssh keys and to let the user run various scripts.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
 
 find systemd -name "cloud*.service*" | xargs sed -i s/StandardOutput=journal+console/StandardOutput=journal/g
 
@@ -140,7 +149,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/99-disable-networking-config.cfg
 %{_sysconfdir}/NetworkManager/dispatcher.d/hook-network-manager
 %{_sysconfdir}/dhcp/dhclient-exit-hooks.d/hook-dhclient
-%{_sysconfdir}/bash_completion.d/cloud-init
 /lib/systemd/system-generators/cloud-init-generator
 /lib/udev/rules.d/66-azure-ephemeral.rules
 /lib/systemd/system/*
@@ -148,11 +156,23 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/cloud-init/*
 %{python3_sitelib}/*
 %{_bindir}/cloud-init*
+%{_bindir}/cloud-id
 %{_bindir}/dscheck_VMwareGuestInfo
+%{_datadir}/bash-completion/completions/cloud-init
 %dir /var/lib/cloud
 
 %changelog
-*   Mon Aug 12 2019 Tapas Kundu <keerthanak@vmware.com> 18.3-5
+*   Thu Oct 17 2019 Keerthana K <keerthanak@vmware.com> 19.1-2
+-   Fix to disable custom script by default in DatasourceOVF.
+-   add kubeadm module
+*   Thu Sep 19 2019 Keerthana K <keerthanak@vmware.com> 19.1-1
+-   Update to 19.1
+-   Patches for enable custom script feature.
+*   Thu Sep 05 2019 Keerthana K <keerthanak@vmware.com> 18.3-6
+-   Fix socket.getfqdn() in DataSourceVMwareGuestInfo
+-   Return False when no data is found in get_data() of DataSourceVMwareGuestInfo.
+-   Disable manage_etc_hosts by default as cloud-init tries to write its default template /etc/hosts file if enabled.
+*   Mon Aug 12 2019 Keerthana K <keerthanak@vmware.com> 18.3-5
 -   Downgrade to 18.3 to fix azure dhcp lease issue.
 *   Tue Jul 23 2019 Keerthana K <keerthanak@vmware.com> 19.1-2
 -   support for additional features in VMGuestInfo Datasource.

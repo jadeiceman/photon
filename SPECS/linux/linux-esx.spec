@@ -1,18 +1,19 @@
 %global security_hardening none
 Summary:        Kernel
 Name:           linux-esx
-Version:        4.19.65
-Release:        2%{?dist}
+Version:        4.19.79
+Release:        1%{?dist}
 License:        GPLv2
 URL:            http://www.kernel.org/
 Group:          System Environment/Kernel
 Vendor:         VMware, Inc.
 Distribution:   Photon
 Source0:        http://www.kernel.org/pub/linux/kernel/v4.x/linux-%{version}.tar.xz
-%define sha1 linux=598111781858ea0aaa328cfa0fec39264d2815d7
+%define sha1 linux=0a45220bfcf4bf33da8b1aa1eb2967e71b66e8aa
 Source1:        config-esx
 Source2:        initramfs.trigger
 Source3:        update_photon_cfg.postun
+Source4:        check_for_config_applicability.inc
 # common
 Patch0:         linux-4.14-Log-kmsg-dump-on-panic.patch
 Patch1:         double-tcp_mem-limits.patch
@@ -23,6 +24,7 @@ Patch4:         SUNRPC-xs_bind-uses-ip_local_reserved_ports.patch
 Patch5:         vsock-transport-for-9p.patch
 Patch6:         4.18-x86-vmware-STA-support.patch
 Patch7:	        9p-trans_fd-extend-port-variable-to-u32.patch
+Patch8:         init-do_mounts-recreate-dev-root.patch
 
 # -esx
 Patch13:        serial-8250-do-not-probe-U6-16550A-fifo-size.patch
@@ -35,6 +37,8 @@ Patch19:        06-pv-ops-boot_clock.patch
 Patch20:        07-vmware-only.patch
 
 Patch22:        4.18-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by-default.patch
+# Fix CVE-2019-17133
+Patch23:        0001-cfg80211_wext_Reject_malformed_SSID_elements.patch
 # Fix CVE-2017-1000252
 Patch24:        kvm-dont-accept-wrong-gsi-values.patch
 # RDRAND-based RNG driver to enhance the kernel's entropy pool:
@@ -103,6 +107,7 @@ The Linux package contains the Linux kernel doc files
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
@@ -112,6 +117,7 @@ The Linux package contains the Linux kernel doc files
 %patch19 -p1
 %patch20 -p1
 %patch22 -p1
+%patch23 -p1
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
@@ -132,7 +138,9 @@ sed -i 's/module_init/late_initcall/' drivers/misc/vmw_balloon.c
 make mrproper
 cp %{SOURCE1} .config
 sed -i 's/CONFIG_LOCALVERSION="-esx"/CONFIG_LOCALVERSION="-%{release}-esx"/' .config
-make LC_ALL= oldconfig
+
+%include %{SOURCE4}
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1-photon" KBUILD_BUILD_HOST="photon" ARCH="x86_64" %{?_smp_mflags}
 
 # Do not compress modules which will be loaded at boot time
@@ -170,12 +178,14 @@ cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
 photon_cmdline=init=/lib/systemd/systemd rcupdate.rcu_expedited=1 rw systemd.show_status=0 quiet noreplace-smp cpu_init_udelay=0
 photon_linux=vmlinuz-%{uname_r}
-#photon_initrd=initrd.img-%{uname_r}
+photon_initrd=initrd.img-%{uname_r}
 EOF
 
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-touch %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r}
+cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
+--add-drivers "lvm dm-mod"
+EOF
 
 # cleanup dangling symlinks
 rm -f %{buildroot}/lib/modules/%{uname_r}/source
@@ -221,6 +231,25 @@ ln -sf linux-%{uname_r}.cfg /boot/photon.cfg
 /usr/src/linux-headers-%{uname_r}
 
 %changelog
+*   Tue Oct 15 2019 Ajay Kaher <akaher@vmware.com> 4.19.79-1
+-   Update to version 4.19.79
+-   Fix CVE-2019-17133
+*   Mon Oct 14 2019 Bo Gan <ganb@vmware.com> 4.19.76-4
+-   Recreate /dev/root in init
+*   Mon Oct 14 2019 Bo Gan <ganb@vmware.com> 4.19.76-3
+-   Enable IMA with SHA256 as default hash algorithm
+*   Thu Oct 10 2019 Harinadh D <hdommaraju@vmware.com> 4.19.76-2
+-   Adding lvm and dm-mod modules to support root as lvm
+*   Wed Oct 02 2019 Ajay Kaher <akaher@vmware.com> 4.19.76-1
+-   Update to version 4.19.76
+*   Mon Sep 30 2019 Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu> 4.19.72-1
+-   Update to version 4.19.72
+*   Thu Sep 05 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.69-2
+-   Avoid oldconfig which leads to potential build hang
+*   Fri Aug 30 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.69-1
+-   Update to version 4.19.69
+*   Fri Aug 23 2019 Him Kalyan Bordoloi <bordoloih@vmware.com> 4.19.65-3
+-   .config: Enable CONFIG_IP_VS_WRR, CONFIG_IP_VS_SH, CONFIG_FB_EFI, CONFIG_TCG_TIS_CORE
 *   Tue Aug 13 2019 Daniel Müller <danielmuller@vmware.com> 4.19.65-2
 -   Add patch "Remove OOM_SCORE_ADJ_MAX limit check"
 *   Tue Aug 06 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.65-1

@@ -1,25 +1,39 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.31.1
-Release:        4%{?dist}
+Version:        2.32
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            http://www.gnu.org/software/binutils
 Group:          System Environment/Base
 Vendor:         VMware, Inc.
 Distribution:   Photon
+Requires:       %{name}-libs = %{version}-%{release}
+
 Source0:        http://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
-%define sha1 binutils=3b031410897fe224412f3a6a1b052402d2fbcc6a
-# Fix CVE-2018-17368 and CVE-2018-17359
-Patch0:         Bug-23686-two-segment-faults-in-nm.patch
-# Fix CVE-2018-17360
-Patch1:         PR23685-buffer-overflow.patch
-# Fix CVE-2018-1000876
-Patch2:         PR23994-libffd-integer-overflow.patch
-Patch3:         binutils-CVE-2019-9075.patch
-Patch4:         binutils-CVE-2019-9077.patch
+%define sha1 binutils=cd45a512af1c8a508976c1beb4f5825b3bb89f4d
+
+Patch0:         binutils-CVE-2019-12972.patch
+Patch1:         binutils-CVE-2019-14444.patch
+Patch2:         binutils-CVE-2019-9071.patch
+Patch3:         binutils-CVE-2019-9073.patch
+Patch4:         binutils-CVE-2019-9074.patch
+Patch5:         binutils-CVE-2019-9075.patch
+Patch6:         binutils-CVE-2019-9077.patch
+Patch7:         binutils-CVE-2019-14250.patch
+Patch8:         binutils-sync-libiberty-add-no-recurse-limit-make-check-fix.patch
+Patch9:         binutils-CVE-2019-1010204.patch
+
 %description
 The Binutils package contains a linker, an assembler,
 and other tools for handling object files.
+
+%package    libs
+Summary:    Shared library files for binutils
+Obsoletes:  binutils <= 2.32-1
+
+%description    libs
+It contains the binutils shared libraries that applications can link
+to at runtime.
 
 %package    devel
 Summary:    Header and development files for binutils
@@ -36,6 +50,11 @@ for handling compiled objects.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
 
 %build
 %configure \
@@ -60,8 +79,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 make %{?_smp_mflags} check
 
 
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 %files -f %{name}.lang
 %defattr(-,root,root)
 %{_bindir}/dwp
@@ -101,10 +118,16 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
+
+%post   libs -p /sbin/ldconfig
+%postun libs -p /sbin/ldconfig
+
+%files libs
 %{_libdir}/libbfd-%{version}.so
 %{_libdir}/libopcodes-%{version}.so
 
 %files devel
+%{_includedir}/bfd_stdint.h
 %{_includedir}/plugin-api.h
 %{_includedir}/symcat.h
 %{_includedir}/bfd.h
@@ -120,6 +143,16 @@ make %{?_smp_mflags} check
 %{_libdir}/libiberty.a
 
 %changelog
+*   Sun Sep 29 2019 Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu> 2.32-2
+-   Separate out libbfd and libopcodes shared libraries into
+-   binutils-libs sub-package.
+*   Mon Aug 26 2019 Satya Naga Vasamsetty <svasamsetty@vmware.com> 2.32-1
+-   Update version to 2.32, fix CVE-2019-1010204, fix a make check failure
+*   Mon Aug 12 2019 Satya Naga Vasamsetty <svasamsetty@vmware.com> 2.31.1-6
+-   Fix CVE-2019-14444, CVE-2019-12972, CVE-2019-14250
+*   Thu Jun 20 2019 Vikash Bansal <bvikas@vmware.com> 2.31.1-5
+-   Fix CVE-2018-20623, CVE-2018-20671, CVE-2018-20651,
+-   CVE-2018-17794-18700-18701-18484, CVE-2019-9071, CVE-2019-9073 and CVE-2019-9074
 *   Thu Mar 14 2019 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 2.31.1-4
 -   Fix CVE-2019-9075 and CVE-2019-9077
 *   Tue Jan 22 2019 Anish Swaminathan <anishs@vmware.com> 2.31.1-3

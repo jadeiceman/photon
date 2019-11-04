@@ -1,14 +1,14 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
-Version:        1.16.1
+Version:        1.17
 Release:        1%{?dist}
 License:        MIT
 URL:            http://web.mit.edu/kerberos/
 Group:          System Environment/Security
 Vendor:         VMware, Inc.
 Distribution:   Photon
-Source0:        http://web.mit.edu/kerberos/www/dist/%{name}/1.16/%{name}-%{version}.tar.gz
-%define sha1    %{name}=8353f2d900a7d52499c7c2605d5e295f71dd5e67
+Source0:        http://web.mit.edu/kerberos/www/dist/%{name}/1.17/%{name}-%{version}.tar.gz
+%define sha1    %{name}=0c404b081db9c996c581f636ce450ee28778f338
 Requires:       openssl
 Requires:       e2fsprogs-libs
 BuildRequires:  openssl-devel
@@ -50,6 +50,7 @@ sed -e 's@\^u}@^u cols 300}@' \
 CPPFLAGS="-D_GNU_SOURCE" \
 autoconf &&
 %configure \
+        --sysconfdir=/etc \
         --localstatedir=/var/lib \
         --with-system-et         \
         --with-system-ss         \
@@ -104,6 +105,7 @@ rm -rf %{buildroot}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%{_mandir}/man7/*
 %{_datarootdir}/man/man5/.k5identity.5.gz
 %{_datarootdir}/man/man5/.k5login.5.gz
 
@@ -119,6 +121,8 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+*   Thu Oct 03 2019 Satya Naga Vasamsetty <svasamsetty@vmware.com> 1.17-1
+-   Update to version 1.17
 *   Fri Sep 14 2018 Ankit Jain <ankitja@vmware.com> 1.16.1-1
 -   Update to version 1.16.1
 *   Wed Dec 13 2017 Xiaolin Li <xiaolinl@vmware.com> 1.16-1

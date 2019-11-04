@@ -1,7 +1,7 @@
 %global security_hardening none
 Summary:        Kernel
 Name:           linux
-Version:        4.19.65
+Version:        4.19.79
 Release:        2%{?kat_build:.%kat_build}%{?dist}
 License:    	GPLv2
 URL:        	http://www.kernel.org/
@@ -9,7 +9,7 @@ Group:        	System Environment/Kernel
 Vendor:         VMware, Inc.
 Distribution: 	Photon
 Source0:        http://www.kernel.org/pub/linux/kernel/v4.x/linux-%{version}.tar.xz
-%define sha1 linux=598111781858ea0aaa328cfa0fec39264d2815d7
+%define sha1 linux=0a45220bfcf4bf33da8b1aa1eb2967e71b66e8aa
 Source1:	config
 Source2:	initramfs.trigger
 %define ena_version 1.6.0
@@ -19,6 +19,7 @@ Source4:	config_aarch64
 Source5:	xr_usb_serial_common_lnx-3.6-and-newer-pak.tar.xz
 %define sha1 xr=74df7143a86dd1519fa0ccf5276ed2225665a9db
 Source6:        update_photon_cfg.postun
+Source7:        check_for_config_applicability.inc
 # common
 Patch0:         linux-4.14-Log-kmsg-dump-on-panic.patch
 Patch1:         double-tcp_mem-limits.patch
@@ -29,6 +30,7 @@ Patch4:         SUNRPC-xs_bind-uses-ip_local_reserved_ports.patch
 Patch5:         vsock-transport-for-9p.patch
 Patch6:         4.18-x86-vmware-STA-support.patch
 Patch7:	        9p-trans_fd-extend-port-variable-to-u32.patch
+Patch8:         perf-scripts-python-Convert-python2-scripts-to-python3.patch
 # ttyXRUSB support
 Patch11:	usb-acm-exclude-exar-usb-serial-ports.patch
 #HyperV patches
@@ -38,6 +40,8 @@ Patch13:        0004-vmbus-Don-t-spam-the-logs-with-unknown-GUIDs.patch
 #FIPS patches - allow some algorithms
 Patch24:        4.18-Allow-some-algo-tests-for-FIPS.patch
 Patch26:        4.18-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by-default.patch
+# Fix CVE-2019-17133
+Patch27:        0001-cfg80211_wext_Reject_malformed_SSID_elements.patch
 # Fix CVE-2017-1000252
 Patch28:        kvm-dont-accept-wrong-gsi-values.patch
 # Out-of-tree patches from AppArmor:
@@ -58,36 +62,54 @@ Patch36:        0001-ip_sockglue-Fix-missing-check-bug-in-ip_ra_control.patch
 Patch38:        0001-ipv6_sockglue-Fix-a-missing-check-bug-in-ip6_ra_cont.patch
 # Fix for CVE-2019-12455
 Patch39:        0001-clk-sunxi-fix-a-missing-check-bug-in-sunxi_divs_clk_.patch
+# Secure boot uefi certificate import patches
+Patch40:        secure-boot-patches/0001-security-integrity-remove-unnecessary-init_keyring-v.patch
+Patch41:	secure-boot-patches/0002-integrity-Define-a-trusted-platform-keyring.patch
+Patch42:	secure-boot-patches/0003-integrity-Load-certs-to-the-platform-keyring.patch
+Patch43:	secure-boot-patches/0004-efi-Add-EFI-signature-data-types.patch
+Patch44:	secure-boot-patches/0005-efi-Add-an-EFI-signature-blob-parser.patch
+Patch45:	secure-boot-patches/0006-efi-Import-certificates-from-UEFI-Secure-Boot.patch
 
 %ifarch aarch64
 # Rpi of_configfs patches
-Patch40:        0001-OF-DT-Overlay-configfs-interface.patch
-Patch41:        0002-of-configfs-Use-of_overlay_fdt_apply-API-call.patch
+Patch200:        0001-OF-DT-Overlay-configfs-interface.patch
+Patch201:        0002-of-configfs-Use-of_overlay_fdt_apply-API-call.patch
+Patch202:        0003-arm64-dts-broadcom-Add-symbols-to-dtb.patch
+# Rpi add 'spidev' to spidev_dt_ids compatible list
+Patch203:        0001-spidev-Add-spidev-compatible-string-to-silence-warni.patch
+# Rpi device tree patch
+Patch204:        0001-Add-SPI-and-Sound-to-rpi3-device-trees.patch
+# Rpi Overlays
+Patch205:        0001-Infrastructure-to-compile-Overlays.patch
+Patch206:        0002-spi0-overlays-files.patch
+Patch207:        0003-audio-overlays-files.patch
 
-# NXP LS1012a FRWY patches
-Patch51:        0001-staging-fsl_ppfe-eth-header-files-for-pfe-driver.patch
-Patch52:        0002-staging-fsl_ppfe-eth-introduce-pfe-driver.patch
-Patch53:        0003-staging-fsl_ppfe-eth-fix-RGMII-tx-delay-issue.patch
-Patch54:        0004-staging-fsl_ppfe-eth-remove-unused-functions.patch
-Patch55:        0005-staging-fsl_ppfe-eth-fix-read-write-ack-idx-issue.patch
-Patch56:        0006-staging-fsl_ppfe-eth-Make-phy_ethtool_ksettings_get-.patch
-Patch57:        0007-staging-fsl_ppfe-eth-add-function-to-update-tmu-cred.patch
-Patch58:        0008-staging-fsl_ppfe-eth-Avoid-packet-drop-at-TMU-queues.patch
-Patch59:        0009-staging-fsl_ppfe-eth-Enable-PFE-in-clause-45-mode.patch
-Patch60:        0010-staging-fsl_ppfe-eth-Disable-autonegotiation-for-2.5.patch
-Patch61:        0011-staging-fsl_ppfe-eth-add-missing-included-header-fil.patch
-Patch62:        0012-staging-fsl_ppfe-eth-clean-up-iounmap-pfe-ddr_basead.patch
-Patch63:        0013-staging-fsl_ppfe-eth-calculate-PFE_PKT_SIZE-with-SKB.patch
-Patch64:        0014-staging-fsl_ppfe-eth-support-for-userspace-networkin.patch
-Patch65:        0015-staging-fsl_ppfe-eth-unregister-netdev-after-pfe_phy.patch
-Patch66:        0016-staging-fsl_ppfe-eth-HW-parse-results-for-DPDK.patch
-Patch67:        0017-staging-fsl_ppfe-eth-reorganize-pfe_netdev_ops.patch
-Patch68:        0018-staging-fsl_ppfe-eth-use-mask-for-rx-max-frame-len.patch
-Patch69:        0019-staging-fsl_ppfe-eth-define-pfe-ndo_change_mtu-funct.patch
-Patch70:        0020-staging-fsl_ppfe-eth-remove-jumbo-frame-enable-from-.patch
-Patch71:        0021-staging-fsl_ppfe-eth-disable-CRC-removal.patch
-Patch72:        0022-staging-fsl_ppfe-eth-handle-ls1012a-errata_a010897.patch
-Patch73:        0023-staging-fsl_ppfe-eth-Modify-Kconfig-to-enable-pfe-dr.patch
+# NXP LS10XXa FRWY patches
+Patch211:        0001-staging-fsl_ppfe-eth-header-files-for-pfe-driver.patch
+Patch212:        0002-staging-fsl_ppfe-eth-introduce-pfe-driver.patch
+Patch213:        0003-staging-fsl_ppfe-eth-fix-RGMII-tx-delay-issue.patch
+Patch214:        0004-staging-fsl_ppfe-eth-remove-unused-functions.patch
+Patch215:        0005-staging-fsl_ppfe-eth-fix-read-write-ack-idx-issue.patch
+Patch216:        0006-staging-fsl_ppfe-eth-Make-phy_ethtool_ksettings_get-.patch
+Patch217:        0007-staging-fsl_ppfe-eth-add-function-to-update-tmu-cred.patch
+Patch218:        0008-staging-fsl_ppfe-eth-Avoid-packet-drop-at-TMU-queues.patch
+Patch219:        0009-staging-fsl_ppfe-eth-Enable-PFE-in-clause-45-mode.patch
+Patch220:        0010-staging-fsl_ppfe-eth-Disable-autonegotiation-for-2.5.patch
+Patch221:        0011-staging-fsl_ppfe-eth-add-missing-included-header-fil.patch
+Patch222:        0012-staging-fsl_ppfe-eth-clean-up-iounmap-pfe-ddr_basead.patch
+Patch223:        0013-staging-fsl_ppfe-eth-calculate-PFE_PKT_SIZE-with-SKB.patch
+Patch224:        0014-staging-fsl_ppfe-eth-support-for-userspace-networkin.patch
+Patch225:        0015-staging-fsl_ppfe-eth-unregister-netdev-after-pfe_phy.patch
+Patch226:        0016-staging-fsl_ppfe-eth-HW-parse-results-for-DPDK.patch
+Patch227:        0017-staging-fsl_ppfe-eth-reorganize-pfe_netdev_ops.patch
+Patch228:        0018-staging-fsl_ppfe-eth-use-mask-for-rx-max-frame-len.patch
+Patch229:        0019-staging-fsl_ppfe-eth-define-pfe-ndo_change_mtu-funct.patch
+Patch230:        0020-staging-fsl_ppfe-eth-remove-jumbo-frame-enable-from-.patch
+Patch231:        0021-staging-fsl_ppfe-eth-disable-CRC-removal.patch
+Patch232:        0022-staging-fsl_ppfe-eth-handle-ls1012a-errata_a010897.patch
+Patch233:        0023-staging-fsl_ppfe-eth-Modify-Kconfig-to-enable-pfe-dr.patch
+
+Patch234:        0001-fsl_dpaa_mac-wait-for-phy-probe-to-complete.patch
 %endif
 
 %if 0%{?kat_build:1}
@@ -104,7 +126,13 @@ BuildRequires:  libmspack-devel
 BuildRequires:  Linux-PAM-devel
 BuildRequires:  openssl-devel
 BuildRequires:  procps-ng-devel
-BuildRequires:	audit-devel
+BuildRequires:  audit-devel
+BuildRequires:  elfutils-libelf-devel
+BuildRequires:  binutils-devel
+BuildRequires:  xz-devel
+BuildRequires:  libunwind-devel
+BuildRequires:  slang-devel
+BuildRequires:  python3-devel
 Requires:       filesystem kmod
 Requires(post):(coreutils or toybox)
 Requires(postun):(coreutils or toybox)
@@ -157,7 +185,7 @@ Kernel driver for oprofile, a statistical profiler for Linux systems
 Summary:        This package contains the 'perf' performance analysis tools for Linux kernel
 Group:          System/Tools
 Requires:       (%{name} = %{version} or linux-esx = %{version} or linux-aws = %{version})
-Requires:       audit
+Requires:       audit elfutils-libelf binutils-libs xz-libs libunwind slang python3
 Obsoletes:      linux-aws-tools <= 4.19.52-1
 Provides:       linux-aws-tools
 %description tools
@@ -172,11 +200,11 @@ Requires:       %{name} = %{version}-%{release}
 Kernel Device Tree Blob files for Raspberry Pi3
 
 %package dtb-ls1012afrwy
-Summary:        Kernel Device Tree Blob files for NXP ls1012a FRWY board
+Summary:        Kernel Device Tree Blob files for NXP FRWY ls1012a and ls1046a boards
 Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
 %description dtb-ls1012afrwy
-Kernel Device Tree Blob files for NXP ls1012a FRWY board
+Kernel Device Tree Blob files for NXP FRWY ls1012a and ls1046a boards
 
 %endif
 
@@ -194,10 +222,12 @@ Kernel Device Tree Blob files for NXP ls1012a FRWY board
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 %patch11 -p1
 %patch13 -p1
 %patch24 -p1
 %patch26 -p1
+%patch27 -p1
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
@@ -209,36 +239,49 @@ Kernel Device Tree Blob files for NXP ls1012a FRWY board
 %patch36 -p1
 %patch38 -p1
 %patch39 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
+%patch43 -p1
+%patch44 -p1
+%patch45 -p1
 
 %ifarch aarch64
 # Rpi of_configfs patches
-%patch40 -p1
-%patch41 -p1
+%patch200 -p1
+%patch201 -p1
+%patch202 -p1
+%patch203 -p1
+%patch204 -p1
+%patch205 -p1
+%patch206 -p1
+%patch207 -p1
 
 # NXP FSL_PPFE Driver patches
-%patch51 -p1
-%patch52 -p1
-%patch53 -p1
-%patch54 -p1
-%patch55 -p1
-%patch56 -p1
-%patch57 -p1
-%patch58 -p1
-%patch59 -p1
-%patch60 -p1
-%patch61 -p1
-%patch62 -p1
-%patch63 -p1
-%patch64 -p1
-%patch65 -p1
-%patch66 -p1
-%patch67 -p1
-%patch68 -p1
-%patch69 -p1
-%patch70 -p1
-%patch71 -p1
-%patch72 -p1
-%patch73 -p1
+%patch211 -p1
+%patch212 -p1
+%patch213 -p1
+%patch214 -p1
+%patch215 -p1
+%patch216 -p1
+%patch217 -p1
+%patch218 -p1
+%patch219 -p1
+%patch220 -p1
+%patch221 -p1
+%patch222 -p1
+%patch223 -p1
+%patch224 -p1
+%patch225 -p1
+%patch226 -p1
+%patch227 -p1
+%patch228 -p1
+%patch229 -p1
+%patch230 -p1
+%patch231 -p1
+%patch232 -p1
+%patch233 -p1
+%patch234 -p1
 %endif
 %if 0%{?kat_build:1}
 %patch1000 -p1
@@ -250,19 +293,19 @@ make mrproper
 %ifarch x86_64
 cp %{SOURCE1} .config
 arch="x86_64"
-archdir="x86"
 %endif
 
 %ifarch aarch64
 cp %{SOURCE4} .config
 arch="arm64"
-archdir="arm64"
 %endif
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL= oldconfig
+
+%include %{SOURCE7}
+
 make VERBOSE=1 KBUILD_BUILD_VERSION="1-photon" KBUILD_BUILD_HOST="photon" ARCH=${arch} %{?_smp_mflags}
-make -C tools perf
+make -C tools perf PYTHON=python3
 %ifarch x86_64
 # build ENA module
 bldroot=`pwd`
@@ -294,6 +337,14 @@ for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
 %{nil}
 
 %install
+%ifarch x86_64
+archdir="x86"
+%endif
+
+%ifarch aarch64
+archdir="arm64"
+%endif
+
 install -vdm 755 %{buildroot}/etc
 install -vdm 755 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/%{name}-%{uname_r}
@@ -331,10 +382,14 @@ install -vm 644 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 644 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-# Install DTB files
+# Install DTB and Overlays files
+install -vdm 755 %{buildroot}/boot/broadcom
+install -vdm 755 %{buildroot}/boot/broadcom/overlays
 install -vdm 755 %{buildroot}/boot/dtb
-install -vm 640 arch/arm64/boot/dts/broadcom/bcm2837-rpi-3-b.dtb %{buildroot}/boot/dtb/
+install -vm 640 arch/arm64/boot/dts/broadcom/*.dtb %{buildroot}/boot/broadcom/
+install -vm 640 arch/arm64/boot/dts/overlays/*.dtbo %{buildroot}/boot/broadcom/overlays/
 install -vm 640 arch/arm64/boot/dts/freescale/fsl-ls1012a-frwy.dtb %{buildroot}/boot/dtb/
+install -vm 640 arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dtb %{buildroot}/boot/dtb/
 %endif
 
 # Restrict the permission on System.map-X file
@@ -355,7 +410,7 @@ EOF
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "tmem xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn"
+--add-drivers "tmem xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon cn lvm dm-mod megaraid_sas"
 EOF
 
 #    Cleanup dangling symlinks
@@ -383,7 +438,7 @@ cp arch/arm64/kernel/module.lds %{buildroot}/usr/src/%{name}-headers-%{uname_r}/
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
 # Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install PYTHON=python3
 
 %include %{SOURCE2}
 %include %{SOURCE6}
@@ -463,15 +518,51 @@ ln -sf %{name}-%{uname_r}.cfg /boot/photon.cfg
 %ifarch aarch64
 %files dtb-rpi3
 %defattr(-,root,root)
-/boot/dtb/bcm2837-rpi-3-b.dtb
+/boot/broadcom/*
 
 %files dtb-ls1012afrwy
 %defattr(-,root,root)
 /boot/dtb/fsl-ls1012a-frwy.dtb
+/boot/dtb/fsl-ls1046a-rdb.dtb
 
 %endif
 
 %changelog
+*   Thu Oct 24 2019 Ajay Kaher <akaher@vmware.com> 4.19.79-2
+-   Enabled WiFi and BT config for Dell 5K.
+*   Tue Oct 15 2019 Ajay Kaher <akaher@vmware.com> 4.19.79-1
+-   Update to version 4.19.79
+-   Fix CVE-2019-17133
+*   Mon Oct 14 2019 Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu> 4.19.76-5
+-   Add megaraid_sas driver to initramfs
+*   Mon Oct 14 2019 Bo Gan <ganb@vmware.com> 4.19.76-4
+-   Enable IMA with SHA256 as default hash algorithm
+*   Thu Oct 10 2019 Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu> 4.19.76-3
+-   Add additional BuildRequires and Requires to fix issues with perf, related to
+-   interactive UI and C++ symbol demangling. Also update the last few perf python
+-   scripts in Linux kernel to use python3 syntax.
+*   Thu Oct 10 2019 Harinadh D <hdommaraju@vmware.com> 4.19.76-2
+-   Adding lvm and dm-mod modules to support root as lvm
+*   Wed Oct 02 2019 Ajay Kaher <akaher@vmware.com> 4.19.76-1
+-   Update to version 4.19.76
+-   Enable USB_SERIAL_PL2303 for aarch64
+*   Mon Sep 30 2019 Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu> 4.19.72-1
+-   Update to version 4.19.72
+*   Thu Sep 05 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.69-3
+-   Avoid oldconfig which leads to potential build hang
+-   Fix archdir usage
+*   Thu Sep 05 2019 Ajay Kaher <akaher@vmware.com> 4.19.69-2
+-   Adding SPI and Audio interfaces in rpi3 device tree
+-   Adding spi0 and audio overlays
+-   Copying rpi dt in /boot/broadcom as u-boot picks from here
+*   Fri Aug 30 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.69-1
+-   Update to version 4.19.69
+*   Fri Aug 23 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.65-4
+-   NXP ls1046a frwy board support.
+-   config_aarch64: add fsl_dpaa2 support.
+-   fix fsl_dpaa_mac initialization issue.
+*   Wed Aug 14 2019 Raejoon Jung <rjung@vmware.com> 4.19.65-3
+-   Backport of Secure Boot UEFI certificate import from v5.2
 *   Mon Aug 12 2019 Ajay Kaher <akaher@vmware.com> 4.19.65-2
 -   Fix config_aarch64 for v4.19.65
 *   Tue Aug 06 2019 Alexey Makhalov <amakhalov@vmware.com> 4.19.65-1
