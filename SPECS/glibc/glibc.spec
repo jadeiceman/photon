@@ -113,10 +113,6 @@ chmod +x find_requires.sh
 
 %build
 
-%if "%{_build}" !=  "%{_host}"
-%define cross_compile 1
-%endif
-
 CONFIGURE_OPTS="\
         --disable-profile \
         --enable-kernel=3.2 \
@@ -127,7 +123,9 @@ CONFIGURE_OPTS="\
         --with-arch=armv7a \
         --with-fpu=vfp \
         --with-float=hard \
-        --with-headers=/target-%{_arch}/usr/include
+%if "%{?cross_compile}" != ""
+        --with-headers=/target-%{_arch}/usr/include \
+%endif
 %endif
 "
 

@@ -1,3 +1,9 @@
+%ifarch %{arm}
+# No files with debuginfo are generated so don't
+# try to generate debuginfo
+%global debug_package %{nil}
+%endif
+
 Summary:	Linux API header files
 Name:		linux-api-headers
 Version:	4.19.65
@@ -9,17 +15,27 @@ Vendor:		VMware, Inc.
 Distribution: Photon
 Source0:        http://www.kernel.org/pub/linux/kernel/v4.x/linux-%{version}.tar.xz
 %define sha1 linux=598111781858ea0aaa328cfa0fec39264d2815d7
-BuildArch:	noarch
+# BuildArch:	noarch
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 %prep
 %setup -q -n linux-%{version}
 %build
 make mrproper
-make headers_check
+%ifarch %{arm}
+    export HOSTCFLAGS="-O2 -g -march=armv7 -mfloat-abi=hard"
+    make ARCH=arm headers_check
+%else
+    make headers_check
+%endif
 %install
 cd %{_builddir}/linux-%{version}
-make INSTALL_HDR_PATH=%{buildroot}%{_prefix} headers_install
+%ifarch %{arm}
+    export HOSTCFLAGS="-O2 -g -march=armv7 -mfloat-abi=hard"
+    make ARCH=arm INSTALL_HDR_PATH=%{buildroot}%{_prefix} headers_install
+%else
+    make INSTALL_HDR_PATH=%{buildroot}%{_prefix} headers_install
+%endif
 find /%{buildroot}%{_includedir} \( -name .install -o -name ..install.cmd \) -delete
 %files
 %defattr(-,root,root)

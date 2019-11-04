@@ -25,7 +25,7 @@ class PackageUtils(object):
         self.nodepsRPMPackageOptions = "--nodeps"
 
         self.rpmbuildBinary = "rpmbuild"
-        self.rpmbuildBuildallOption = "-ba --clean"
+        self.rpmbuildBuildallOption = "-ba --clean --target=%s-unknown-linux" % constants.targetArch
         self.rpmbuildNocheckOption = "--nocheck"
         self.rpmbuildCheckOption = "-bi --clean"
         self.queryRpmPackageOptions = "-qa"
@@ -309,6 +309,8 @@ class PackageUtils(object):
             # Target should be informat of cpu-vendor-os (e.g. arm-unknown-linux)
             tupleParts = constants.targetArchTuple.split('-')
             rpmBuildcmd += ' --target=%s-%s-%s' % (tupleParts[0], tupleParts[1], tupleParts[2])
+        else:
+            rpmBuildcmd += ' --define \"_arch %s\"' % constants.targetArch
             
         rpmBuildcmd += " " + specFile
 

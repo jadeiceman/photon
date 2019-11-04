@@ -165,7 +165,7 @@ class ToolChainUtils(object):
                     rpmFile = pkgUtils.findRPMFile(package, version, constants.buildArch)
 
             if rpmFile is None:
-                self.logger.debug(">>>> usePublishedRPMS=%r, isAvailable=%r, crossCompiling=%r", usePublishedRPMS, isAvailable, constants.crossCompiling)
+#                self.logger.debug(">>>> usePublishedRPMS=%r, isAvailable=%r, crossCompiling=%r", usePublishedRPMS, isAvailable, constants.crossCompiling)
                 if not usePublishedRPMS or isAvailable or constants.crossCompiling:
                     raise Exception("%s-%s.%s not found in available packages" % (package, version, constants.buildArch))
 
@@ -187,7 +187,7 @@ class ToolChainUtils(object):
 
         self.logger.debug(rpmFiles)
         self.logger.debug(packages)
-        cmd = (self.rpmCommand + " -i -v --nodeps --noorder --force --root " +
+        cmd = (self.rpmCommand + " -i -v --ignorearch --nodeps --noorder --force --root " +
                chroot.getID() +" --define \'_dbpath /var/lib/rpm\' "+ rpmFiles)
         retVal = CommandUtils.runCommandInShell(cmd, logfn=self.logger.debug)
         if retVal != 0:
