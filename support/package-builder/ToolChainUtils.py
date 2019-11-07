@@ -38,6 +38,7 @@ class ToolChainUtils(object):
         if len(listFilterRPMFiles) == 0:
             return None
         if len(listFilterRPMFiles) > 1:
+            self.logger.error("RPMS:\n %s" % "\n ".join(listFilterRPMFiles))
             self.logger.error("Found multiple rpm files for given package in rpm directory." +
                               "Unable to determine the rpm file for package:" + package)
             return None

@@ -38,7 +38,7 @@ Provides: libgcc_s.so.1(GLIBC_2.0)
 BuildRequires: binutils-armv7l-linux-gnueabihf
 Requires: binutils-armv7l-linux-gnueabihf
 
-%global target_arch armv7l-unknown-linux-gnueabihf
+%global target_arch arm-unknown-linux-gnueabihf
 %global target_linux_arch arm
 %global sysroot /target-armv7l
 

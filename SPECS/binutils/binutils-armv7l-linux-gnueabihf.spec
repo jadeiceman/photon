@@ -11,7 +11,7 @@ Source0: https://ftp.gnu.org/gnu/binutils/binutils-%{version}.tar.xz
 %define sha1 binutils=3b031410897fe224412f3a6a1b052402d2fbcc6a
 BuildArch: x86_64
 
-%define target_arch armv7l-unknown-linux-gnueabihf
+%define target_arch arm-unknown-linux-gnueabihf
 %define sysroot /target-armv7l
 
 %define target_arm_arch armv7a

@@ -4,6 +4,10 @@
 %define linux_kernel_version 4.19.65
 %global _lib /lib
 
+%ifarch %{arm}
+%global linux_arch arm
+%endif
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.28
@@ -134,8 +138,8 @@ CONFIGURE_OPTS="\
 %if "%{?cross_compile}" != ""
 cd %{_builddir}/linux-%{linux_kernel_version} && \
 make mrproper && \
-make ARCH=%{_arch} headers_check && \
-make ARCH=%{_arch} \
+make ARCH=%{linux_arch} headers_check && \
+make ARCH=%{linux_arch} \
      INSTALL_HDR_PATH=/target-%{_arch}%{_prefix} \
      headers_install
 %endif
