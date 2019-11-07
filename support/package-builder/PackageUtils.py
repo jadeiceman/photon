@@ -287,12 +287,13 @@ class PackageUtils(object):
 
         if constants.crossCompiling:
             buildTuple = '%s-unknown-linux-gnu' % constants.buildArch
+            hostTuple = constants.targetArchTuple.replace("armv7l", "arm")
             targetMacroPath = '%s/macros/macros.%s' % (constants.topDirPath, constants.targetArch)
             localTargetMacroPath = sandbox.getID() + targetMacroPath
             macroPath = '/etc/rpm/macros.%s' % constants.targetArch
 
             rpmBuildcmd += ' --define \"_build %s\"' % buildTuple
-            rpmBuildcmd += ' --define \"_host %s\"' % constants.targetArchTuple
+            rpmBuildcmd += ' --define \"_host %s\"' % hostTuple
             rpmBuildcmd += ' --define \"cross_compile 1\"'
             
             self.logger.debug("Searching for macro file: %s" % localTargetMacroPath)
